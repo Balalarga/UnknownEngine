@@ -1,5 +1,5 @@
-﻿#ifndef PLATE_SDLSUBSYSTEM_H
-#define PLATE_SDLSUBSYSTEM_H
+﻿#ifndef SDLSUBSYSTEM_H
+#define SDLSUBSYSTEM_H
 
 #include <map>
 #include <memory>
@@ -36,4 +36,4 @@ protected:
 };
 
 
-#endif //PLATE_SDLSUBSYSTEM_H
+#endif //SDLSUBSYSTEM_H

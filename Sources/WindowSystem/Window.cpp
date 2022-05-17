@@ -67,26 +67,34 @@ void AppWindow::Show()
     }
 }
 
-void AppWindow::Hide()
+void AppWindow::Close()
 {
-    bShouldClose = false;
+    bShouldClose = true;
 }
 
 void AppWindow::HandleEvents()
 {
+    auto& Input = InputSystem::Get();
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
         ImGui_ImplSDL2_ProcessEvent(&event);
-        if (event.type == SDL_QUIT)
+        switch(event.type)
         {
-            bShouldClose = true;
-        }
-        if (event.type == SDL_WINDOWEVENT &&
-                event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(SDLWindow))
-        {
-            bShouldClose = true;
+            case SDL_QUIT:
+                bShouldClose = true;
+                break;
+            case SDL_WINDOWEVENT:
+                bShouldClose = event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                    event.window.windowID == SDL_GetWindowID(SDLWindow);
+                break;
+            case SDL_KEYDOWN:
+                Input.OnStateChange(event.key.keysym.scancode,
+                        event.key.repeat == 0 ? KeyState::Pressed : KeyState::Repeated);
+                break;
+            case SDL_KEYUP:
+                Input.OnStateChange(event.key.keysym.scancode, KeyState::Released);
+                break;
         }
     }
 }

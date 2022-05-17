@@ -1,12 +1,14 @@
-﻿#ifndef PLATE_WINDOW_H
-#define PLATE_WINDOW_H
+﻿#ifndef WINDOW_H
+#define WINDOW_H
 
 #include <string>
+
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <glm/glm.hpp>
 
-#include "glm/glm.hpp"
+#include "InputSystem.h"
 
 
 struct AppWindowParams
@@ -35,7 +37,7 @@ public:
     inline const glm::vec4& GetBackgroundColor() { return BackColor; }
     
     void Show();
-    void Hide();
+    void Close();
     
     void HandleEvents();
     void Clear();
@@ -57,4 +59,4 @@ private:
 };
 
 
-#endif //PLATE_WINDOW_H
+#endif //WINDOW_H

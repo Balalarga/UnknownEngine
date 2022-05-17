@@ -14,9 +14,9 @@ set(LIBS mingw32 opengl32 glu32 Imm32)
 
 # GLEW setup
 set(GLEW_DIR ${THIRDPARTY_DIR}/GLEW)
-link_directories(${GLEW_DIR}/lib)
+link_directories(${GLEW_DIR}/lib/x64)
 include_directories(${GLEW_DIR}/include)
-set(BINARIES ${GLEW_DIR}/bin)
+set(BINARIES ${GLEW_DIR}/bin/x64)
 set(LIBS ${LIBS} glew32)
 
 
@@ -59,8 +59,12 @@ target_include_directories(${PROJECT_NAME} PRIVATE Sources)
 
 
 if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json)
-    configure_file(${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json COPYONLY)
+    #configure_file(${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json COPYONLY)
+    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/compile_commands.json $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif()
+
 
 # Copy dll files
 foreach(BINARY ${BINARIES})
