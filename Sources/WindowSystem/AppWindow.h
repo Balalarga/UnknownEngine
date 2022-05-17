@@ -31,7 +31,7 @@ class AppWindow
 {
 public:
     AppWindow(const AppWindowParams& params);
-    ~AppWindow();
+    virtual ~AppWindow();
 
     void SetBackgroundColor(const glm::vec4 newColor);
     inline const glm::vec4& GetBackgroundColor() { return BackColor; }
@@ -39,14 +39,14 @@ public:
     void Show();
     void Close();
     
-    void HandleEvents();
-    void Clear();
-    void Render();
-    void PostRender();
+    virtual void HandleEvents(SDL_Event& event);
+    virtual void Clear();
+    virtual void Render();
+    virtual void PostRender();
     
-    void ClearImGui();
-    void RenderImGui();
-    void PostRenderImGui();
+    virtual void ClearImGui();
+    virtual void RenderImGui();
+    virtual void PostRenderImGui();
     
 
 private:

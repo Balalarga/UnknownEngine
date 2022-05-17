@@ -24,7 +24,16 @@ class SDLSubsystem
 public:
     static SDLSubsystem& Get();
     
-    std::shared_ptr<AppWindow> MakeWindow(AppWindowParams params);
+    template<class T>
+    std::shared_ptr<T> MakeWindow(AppWindowParams params)
+    {
+        auto founded = Windows.find(params.Title);
+        if (founded != Windows.end())
+            return std::dynamic_pointer_cast<T>(founded->second);
+
+        Windows[params.Title] = std::make_shared<T>(params);
+        return std::static_pointer_cast<T>(Windows[params.Title]);
+    }
     
     SDLError Init();
     

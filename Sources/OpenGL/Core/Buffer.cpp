@@ -26,7 +26,7 @@ bool Buffer::Create(unsigned& handler)
 
     glGenBuffers(1, &handler);
     glBindBuffer(Type, handler);
-    glBufferData(Type, Data.ItemSize * Data.ItemSize, Data.Ptr, Mode);
+    glBufferData(Type, Data.Count * Data.ItemSize, Data.Ptr, Mode);
 
     size_t offset = 0;
     for (size_t i = 0; i < Layout.Variables.size(); ++i)

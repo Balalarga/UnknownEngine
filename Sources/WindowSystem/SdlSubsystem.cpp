@@ -33,12 +33,3 @@ SDLError SDLSubsystem::Init()
     return SDLError::Ok;
 }
 
-std::shared_ptr<AppWindow> SDLSubsystem::MakeWindow(AppWindowParams params)
-{
-    auto founded = Windows.find(params.Title);
-    if (founded != Windows.end())
-        return founded->second;
-
-    Windows[params.Title] = std::make_shared<AppWindow>(params);
-    return Windows[params.Title];
-}

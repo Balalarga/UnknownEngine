@@ -53,7 +53,10 @@ void AppWindow::Show()
 
     while (!bShouldClose)
     {
-        HandleEvents();
+        SDL_Event event;
+        while (SDL_PollEvent(&event))
+            HandleEvents(event);
+
         if (bShouldClose)
             break;
 
@@ -72,36 +75,32 @@ void AppWindow::Close()
     bShouldClose = true;
 }
 
-void AppWindow::HandleEvents()
+void AppWindow::HandleEvents(SDL_Event& event)
 {
     auto& Input = InputSystem::Get();
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
+    ImGui_ImplSDL2_ProcessEvent(&event);
+    switch(event.type)
     {
-        ImGui_ImplSDL2_ProcessEvent(&event);
-        switch(event.type)
-        {
-            case SDL_QUIT:
-                bShouldClose = true;
-                break;
-            case SDL_WINDOWEVENT:
-                bShouldClose = event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                    event.window.windowID == SDL_GetWindowID(SDLWindow);
-                break;
-            case SDL_KEYDOWN:
-                Input.OnStateChange(event.key.keysym.scancode,
-                        event.key.repeat == 0 ? KeyState::Pressed : KeyState::Repeated);
-                break;
-            case SDL_KEYUP:
-                Input.OnStateChange(event.key.keysym.scancode, KeyState::Released);
-                break;
-        }
+        case SDL_QUIT:
+            bShouldClose = true;
+            break;
+        case SDL_WINDOWEVENT:
+            bShouldClose = event.window.event == SDL_WINDOWEVENT_CLOSE &&
+                event.window.windowID == SDL_GetWindowID(SDLWindow);
+            break;
+        case SDL_KEYDOWN:
+            Input.OnStateChange(event.key.keysym.scancode,
+                    event.key.repeat == 0 ? KeyState::Pressed : KeyState::Repeated);
+            break;
+        case SDL_KEYUP:
+            Input.OnStateChange(event.key.keysym.scancode, KeyState::Released);
+            break;
     }
 }
 
 void AppWindow::Clear()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
 void AppWindow::Render()
