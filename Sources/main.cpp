@@ -4,16 +4,8 @@
 using namespace std;
 
 
-int main(int argc, char** argv)
+void BaseInput(AppWindow* Window)
 {
-    SDLSubsystem& Sdl = SDLSubsystem::Get();
-    Sdl.Init();
-    AppWindowParams Params("Window");
-    Params.Vsync = true;
-    
-    auto Window = Sdl.MakeWindow(Params);
-    Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
-    
     InputSystem::Get().Add(SDL_SCANCODE_SPACE, [](KeyState state){
             if (state == KeyState::Pressed)
                 std::cout << "Space pressed\n";
@@ -24,8 +16,23 @@ int main(int argc, char** argv)
             if (state == KeyState::Pressed)
                 Window->Close();
         });
+}
+
+
+int main(int argc, char** argv)
+{
+    SDLSubsystem& Sdl = SDLSubsystem::Get();
+    Sdl.Init();
+    AppWindowParams Params("Window");
+    Params.Vsync = true;
+    
+    std::shared_ptr<AppWindow> Window = Sdl.MakeWindow(Params);
+    Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
+    
+    BaseInput(Window.get());
 
     Window->Show();
 
     return 0;
 }
+
