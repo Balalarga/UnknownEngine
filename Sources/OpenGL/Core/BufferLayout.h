@@ -9,7 +9,14 @@ struct VariableInfo
     unsigned Type;
     unsigned Count;
     unsigned Size;
+    bool Normalized = true;
 };
+
+struct BufferItemWrapper
+{
+
+};
+
 
 struct BufferLayout
 {
@@ -20,5 +27,4 @@ struct BufferLayout
     std::vector<VariableInfo> Variables;
     unsigned Size = 0;
 };
-
 

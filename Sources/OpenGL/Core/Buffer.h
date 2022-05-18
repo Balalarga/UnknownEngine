@@ -16,6 +16,8 @@ struct DataPtr
 
 struct Buffer
 {
+    Buffer(const DataPtr& data, const BufferLayout& layout = BufferLayout());
+
     DataPtr Data;
     BufferLayout Layout;
     unsigned DrawType = GL_TRIANGLES;

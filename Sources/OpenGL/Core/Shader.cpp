@@ -13,7 +13,6 @@ Shader::Shader(const std::string &vertexCode,
     Handler(0)
 {
     Compile();
-    AddUniforms({"MVP"});
 }
 
 bool Shader::HasErrors(unsigned shaderId)

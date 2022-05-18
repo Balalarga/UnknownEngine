@@ -5,6 +5,34 @@
 using namespace std;
 
 
+std::string vshader = R"(
+#version 330
+
+layout(location = 0)in vec3 iVert;
+layout(location = 1)in vec4 iVertColor;
+
+out vec4 vertColor;
+
+void main()
+{
+    gl_Position = vec4(iVert, 1.0);
+    vertColor = iVertColor;
+}
+)";
+std::string fshader = R"(
+#version 330
+
+in vec4 vertColor;
+out vec4 fragColor;
+
+void main()
+{
+    fragColor = vec4(0.5, 0.1, 0.1, 1.0);
+    fragColor = vertColor;
+}
+)";
+
+
 void BaseInput(AppWindow* Window)
 {
     InputSystem::Get().Add(SDL_SCANCODE_ESCAPE,
@@ -13,24 +41,25 @@ void BaseInput(AppWindow* Window)
             if (state == KeyState::Pressed)
                 Window->Close();
         });
+    std::cout<<"Input setup\n";
 }
 
 void BaseObjects(OpenglWindow* Window)
 {
-    struct Vertex{
-        glm::vec3 pos;
-        glm::vec4 color;
+    struct {
+        float x, y, z;
+        float r, g, b, a;
+    } triangle[] {
+        {-0.1f, -0.1f, 0.f, 1.f, 0.f, 0.f, 1.f},
+        {-0.1f,  0.1f, 0.f, 1.f, 1.f, 0.f, 1.f},
+        { 0.0f,  0.0f, 0.f, 1.f, 0.f, 0.f, 1.f},
     };
-
-    Vertex triangle[]{
-        {{-1.f, -1.f, 0.f}, {1.f, 1.f, 1.f, 1.f}},
-        {{-1.f,  1.f, 0.f}, {1.f, 1.f, 1.f, 1.f}},
-        {{ 0.f,  0.f, 0.f}, {1.f, 1.f, 1.f, 1.f}},
-        };
-    Buffer buffer;
-    buffer.Layout.Float(3).Float(4);
-    buffer.Data = DataPtr(&triangle, 3, sizeof(Vertex));
-    auto& Obj1 = Window->AddObject<IRenderable>(buffer);
+    Buffer buffer(DataPtr(triangle, sizeof(triangle)/sizeof(triangle[0]), sizeof(triangle[0])), BufferLayout().Float(3).Float(4));
+    auto* Obj1 = Window->AddObject(new IRenderable(buffer));
+    std::cout<<"Object created\n";
+    Obj1->SetShader(std::make_shared<Shader>(vshader, fshader));
+    std::cout<<"Shader created\n";
+    std::cout<<"Objects setup\n";
 }
 
 int main(int argc, char** argv)
@@ -42,6 +71,7 @@ int main(int argc, char** argv)
     
     std::shared_ptr<OpenglWindow> Window = Sdl.MakeWindow<OpenglWindow>(Params);
     Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
+    std::cout<<"Window created\n";
     
     BaseInput(Window.get());
     BaseObjects(Window.get());

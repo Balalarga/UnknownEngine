@@ -17,6 +17,10 @@ AppWindow::AppWindow(const AppWindowParams& params):
             Params.Flags);
     GlContext = SDL_GL_CreateContext(SDLWindow);
 
+    glewExperimental = GL_TRUE;
+    if (glewInit() != GLEW_OK)
+        return;
+
     SDL_GL_MakeCurrent(SDLWindow, GlContext);
 
     if (Params.Vsync)

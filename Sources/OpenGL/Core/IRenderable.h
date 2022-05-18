@@ -15,19 +15,17 @@ public:
     IRenderable(const Buffer& vbo);
     virtual ~IRenderable();
 
-    void SetShader(const std::shared_ptr<Shader>& shader);
-
     virtual void Render();
 
-
-    inline Shader* GetShader() { return Shader.get(); }
+    void SetShader(std::shared_ptr<Shader> shader) { ShaderPtr = shader; }
+    inline Shader* GetShader() { return ShaderPtr.get(); }
 
 
 private:
     Buffer Vbo;
-    std::shared_ptr<Shader> Shader;
+    GLuint Handler;
+    std::shared_ptr<Shader> ShaderPtr;
 
-    unsigned Handler;
     glm::mat4 ModelMatrix;
 };
 

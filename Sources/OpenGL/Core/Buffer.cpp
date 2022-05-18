@@ -18,6 +18,12 @@ DataPtr::DataPtr(void* ptr, unsigned count, unsigned itemSize):
 
 }
 
+Buffer::Buffer(const DataPtr& data, const BufferLayout& layout):
+    Data(data),
+    Layout(layout)
+{
+
+}
 
 bool Buffer::Create(unsigned& handler)
 {
@@ -31,15 +37,14 @@ bool Buffer::Create(unsigned& handler)
     size_t offset = 0;
     for (size_t i = 0; i < Layout.Variables.size(); ++i)
     {
-        const auto& item = Layout.Variables[i];
         glEnableVertexAttribArray(i);
         glVertexAttribPointer(i,
                               Layout.Variables[i].Count,
                               Layout.Variables[i].Type,
-                              GL_FALSE,
+                              Layout.Variables[i].Normalized ? GL_FALSE : GL_TRUE,
                               Layout.Size,
-                              (void*)&offset);
-        offset += item.Size;
+                              (void*)offset);
+        offset += Layout.Variables[i].Size * Layout.Variables[i].Count;
     }
     return true;
 }
