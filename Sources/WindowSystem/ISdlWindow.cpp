@@ -1,57 +1,45 @@
-﻿#include "AppWindow.h"
+﻿#include "ISdlWindow.h"
 #include <iostream>
 
 #include <imgui.h>
 #include <imgui_impl_sdl.h>
-#include <imgui_impl_opengl3.h>
 
 
-AppWindow::AppWindow(const AppWindowParams& params):
+static Uint32 DefaultSdlSubsystems = SDL_INIT_EVERYTHING;
+
+ISdlWindow::ISdlWindow(const ISdlWindowParams& params):
     Params(params)
 {
+    if (SDL_Init(DefaultSdlSubsystems) != 0)
+        return;
+
     SDLWindow = SDL_CreateWindow(Params.Title.c_str(),
             Params.X,
             Params.Y,
             Params.Width,
             Params.Height,
             Params.Flags);
-    GlContext = SDL_GL_CreateContext(SDLWindow);
-
-    glewExperimental = GL_TRUE;
-    if (glewInit() != GLEW_OK)
-        return;
-
-    SDL_GL_MakeCurrent(SDLWindow, GlContext);
-
+    
     if (Params.Vsync)
         SDL_GL_SetSwapInterval(1);
 
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
-    const char* glsl_version = "#version 130";
-
-    ImGui_ImplSDL2_InitForOpenGL(SDLWindow, GlContext);
-    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
-AppWindow::~AppWindow()
+ISdlWindow::~ISdlWindow()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-
-    SDL_GL_DeleteContext(GlContext);
     SDL_DestroyWindow(SDLWindow);
 }
 
-void AppWindow::SetBackgroundColor(const glm::vec4 newColor)
+void ISdlWindow::SetBackgroundColor(const glm::vec4 newColor)
 {
     BackColor = newColor;
-    glClearColor(BackColor.r, BackColor.g, BackColor.b, BackColor.a);
 }
 
-void AppWindow::Show()
+void ISdlWindow::Show()
 {
     bShouldClose = false;
 
@@ -74,12 +62,12 @@ void AppWindow::Show()
     }
 }
 
-void AppWindow::Close()
+void ISdlWindow::Close()
 {
     bShouldClose = true;
 }
 
-void AppWindow::HandleEvents(SDL_Event& event)
+void ISdlWindow::HandleEvents(SDL_Event& event)
 {
     auto& Input = InputSystem::Get();
     ImGui_ImplSDL2_ProcessEvent(&event);
@@ -102,35 +90,33 @@ void AppWindow::HandleEvents(SDL_Event& event)
     }
 }
 
-void AppWindow::Clear()
+void ISdlWindow::Clear()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 }
 
-void AppWindow::Render()
+void ISdlWindow::Render()
 {
 
 }
 
-void AppWindow::PostRender()
+void ISdlWindow::PostRender()
 {
     SDL_GL_SwapWindow(SDLWindow);
 }
 
-void AppWindow::ClearImGui()
+void ISdlWindow::ClearImGui()
 {
-    ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 }
 
-void AppWindow::RenderImGui()
+void ISdlWindow::RenderImGui()
 {
     
 }
 
-void AppWindow::PostRenderImGui()
+void ISdlWindow::PostRenderImGui()
 {
     ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -1,5 +1,5 @@
-﻿#ifndef WINDOW_H
-#define WINDOW_H
+﻿#ifndef ISdlWindow_H
+#define ISdlWindow_H
 
 #include <string>
 
@@ -11,9 +11,9 @@
 #include "InputSystem.h"
 
 
-struct AppWindowParams
+struct ISdlWindowParams
 {
-    AppWindowParams(const std::string& title):
+    ISdlWindowParams(const std::string& title = "New Window"):
         Title(title)
     {}
     std::string Title;
@@ -27,34 +27,36 @@ struct AppWindowParams
 };
 
 
-class AppWindow
+class ISdlWindow
 {
 public:
-    AppWindow(const AppWindowParams& params);
-    virtual ~AppWindow();
+    ISdlWindow(const ISdlWindowParams& params = ISdlWindowParams());
+    virtual ~ISdlWindow();
 
-    void SetBackgroundColor(const glm::vec4 newColor);
-    inline const glm::vec4& GetBackgroundColor() { return BackColor; }
-    
     void Show();
     void Close();
+
+    inline const glm::vec4& GetBackgroundColor() { return BackColor; }
+    virtual void SetBackgroundColor(const glm::vec4 newColor);
     
     virtual void HandleEvents(SDL_Event& event);
     virtual void Clear();
-    virtual void Render();
+    virtual void Render() = 0;
     virtual void PostRender();
     
     virtual void ClearImGui();
     virtual void RenderImGui();
     virtual void PostRenderImGui();
     
+    inline SDL_Window* GetSdlWindow() const { return SDLWindow; }
+    inline const ISdlWindowParams& GetParams() const { return Params; }
+
 
 private:
-    AppWindowParams Params;
+    ISdlWindowParams Params;
     SDL_Window* SDLWindow;
-    SDL_GLContext GlContext;
+
     bool bShouldClose;
-    
     glm::vec4 BackColor;
 };
 

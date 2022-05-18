@@ -3,24 +3,23 @@
 #include <vector>
 
 #include "OpenGL/Core/IRenderable.h"
-#include "WindowSystem/AppWindow.h"
+#include "WindowSystem/ISdlWindow.h"
 
 
-
-class OpenglWindow: public AppWindow
+class OpenglWindow: public ISdlWindow
 {
 public:
-    OpenglWindow(const AppWindowParams& params);
+    OpenglWindow(const ISdlWindowParams& params = ISdlWindowParams());
+    ~OpenglWindow();
 
-    IRenderable* AddObject(IRenderable*&& Obj)
-    {
-        RenderObjects.push_back(std::unique_ptr<IRenderable>(Obj));
-        return RenderObjects.back().get();
-    }
+    IRenderable* AddObject(IRenderable*&& Obj);
 
+    void SetBackgroundColor(const glm::vec4 newColor) override;
     void Render() override;
-
+    void ClearImGui() override;
+    void PostRenderImGui() override;
 
 private:
     std::vector<std::unique_ptr<IRenderable>> RenderObjects;
+    SDL_GLContext GlContext;
 };

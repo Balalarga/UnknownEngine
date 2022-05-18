@@ -13,7 +13,7 @@ enum class KeyState
 
 class InputSystem
 {
-    friend class AppWindow;
+    friend class ISdlWindow;
 public:
     static InputSystem& Get();
 

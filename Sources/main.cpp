@@ -1,6 +1,5 @@
 #include <iostream>
 #include "WindowSystem/OpenglWindow.h"
-#include "WindowSystem/SdlSubsystem.h"
 
 using namespace std;
 
@@ -33,7 +32,7 @@ void main()
 )";
 
 
-void BaseInput(AppWindow* Window)
+void BaseInput(ISdlWindow* Window)
 {
     InputSystem::Get().Add(SDL_SCANCODE_ESCAPE,
         [&Window](KeyState state)
@@ -41,7 +40,6 @@ void BaseInput(AppWindow* Window)
             if (state == KeyState::Pressed)
                 Window->Close();
         });
-    std::cout<<"Input setup\n";
 }
 
 void BaseObjects(OpenglWindow* Window)
@@ -56,22 +54,16 @@ void BaseObjects(OpenglWindow* Window)
     };
     Buffer buffer(DataPtr(triangle, sizeof(triangle)/sizeof(triangle[0]), sizeof(triangle[0])), BufferLayout().Float(3).Float(4));
     auto* Obj1 = Window->AddObject(new IRenderable(buffer));
-    std::cout<<"Object created\n";
     Obj1->SetShader(std::make_shared<Shader>(vshader, fshader));
-    std::cout<<"Shader created\n";
-    std::cout<<"Objects setup\n";
 }
 
 int main(int argc, char** argv)
 {
-    SDLSubsystem& Sdl = SDLSubsystem::Get();
-    Sdl.Init();
-    AppWindowParams Params("Window");
+    ISdlWindowParams Params;
     Params.Vsync = true;
     
-    std::shared_ptr<OpenglWindow> Window = Sdl.MakeWindow<OpenglWindow>(Params);
+    std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
     Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
-    std::cout<<"Window created\n";
     
     BaseInput(Window.get());
     BaseObjects(Window.get());

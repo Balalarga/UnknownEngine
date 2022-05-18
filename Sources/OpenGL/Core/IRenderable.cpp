@@ -17,11 +17,7 @@ IRenderable::IRenderable(const Buffer &vbo):
 
     glBindVertexArray(0);
     if (vboCreated)
-    {
-        std::cout<<"Vbo not created\n";
         glDeleteBuffers(1, &vboId);
-    }
-    std::cout<<"Renderable created\n";
 }
 
 IRenderable::~IRenderable()
