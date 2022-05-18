@@ -1,2 +1,2 @@
 # OpenglWrapper
-Small opengl wrapper for fast prototyping
+Small SDL2+opengl with optional ImGui support wrapper for fast prototyping
