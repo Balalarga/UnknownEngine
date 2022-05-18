@@ -16,8 +16,11 @@ public:
 
     void SetBackgroundColor(const glm::vec4 newColor) override;
     void Render() override;
+    
+#if USE_IMGUI
     void ClearImGui() override;
     void PostRenderImGui() override;
+#endif
 
 private:
     std::vector<std::unique_ptr<IRenderable>> RenderObjects;

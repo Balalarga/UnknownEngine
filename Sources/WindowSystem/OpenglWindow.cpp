@@ -1,7 +1,9 @@
 #include "OpenglWindow.h"
 
-#include <imgui_impl_sdl.h>
-#include <imgui_impl_opengl3.h>
+#if USE_IMGUI
+    #include <imgui_impl_sdl.h>
+    #include <imgui_impl_opengl3.h>
+#endif
 
 
 OpenglWindow::OpenglWindow(const ISdlWindowParams& params):
@@ -23,17 +25,21 @@ OpenglWindow::OpenglWindow(const ISdlWindowParams& params):
 
     SDL_GL_MakeCurrent(GetSdlWindow(), GlContext);
 
+#if USE_IMGUI
     const char* glsl_version = "#version 130";
 
     ImGui_ImplSDL2_InitForOpenGL(GetSdlWindow(), GlContext);
     ImGui_ImplOpenGL3_Init(glsl_version);
+#endif
 }
 
 OpenglWindow::~OpenglWindow()
 {
     SDL_GL_DeleteContext(GlContext);
+#if USE_IMGUI
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
+#endif
 }
 
 IRenderable* OpenglWindow::AddObject(IRenderable*&& Obj)
@@ -59,6 +65,7 @@ void OpenglWindow::Render()
     ISdlWindow::Render();
 }
 
+#if USE_IMGUI
 void OpenglWindow::ClearImGui()
 {
     ImGui_ImplOpenGL3_NewFrame();
@@ -70,3 +77,4 @@ void OpenglWindow::PostRenderImGui()
     ISdlWindow::PostRenderImGui();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
+#endif

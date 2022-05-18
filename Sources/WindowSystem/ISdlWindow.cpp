@@ -1,8 +1,10 @@
 ﻿#include "ISdlWindow.h"
 #include <iostream>
 
-#include <imgui.h>
-#include <imgui_impl_sdl.h>
+#if USE_IMGUI
+    #include <imgui.h>
+    #include <imgui_impl_sdl.h>
+#endif
 
 
 static Uint32 DefaultSdlSubsystems = SDL_INIT_EVERYTHING;
@@ -23,14 +25,18 @@ ISdlWindow::ISdlWindow(const ISdlWindowParams& params):
     if (Params.Vsync)
         SDL_GL_SetSwapInterval(1);
 
+#if USE_IMGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGui::StyleColorsDark();
+#endif
 }
 
 ISdlWindow::~ISdlWindow()
 {
+#if USE_IMGUI
     ImGui::DestroyContext();
+#endif
     SDL_DestroyWindow(SDLWindow);
 }
 
@@ -52,9 +58,11 @@ void ISdlWindow::Show()
         if (bShouldClose)
             break;
 
+#if USE_IMGUI
         ClearImGui();
         RenderImGui();
         PostRenderImGui();
+#endif
 
         Clear();
         Render();
@@ -70,7 +78,9 @@ void ISdlWindow::Close()
 void ISdlWindow::HandleEvents(SDL_Event& event)
 {
     auto& Input = InputSystem::Get();
+#if USE_IMGUI
     ImGui_ImplSDL2_ProcessEvent(&event);
+#endif
     switch(event.type)
     {
         case SDL_QUIT:
@@ -105,6 +115,7 @@ void ISdlWindow::PostRender()
     SDL_GL_SwapWindow(SDLWindow);
 }
 
+#if USE_IMGUI
 void ISdlWindow::ClearImGui()
 {
     ImGui_ImplSDL2_NewFrame();
@@ -120,3 +131,4 @@ void ISdlWindow::PostRenderImGui()
 {
     ImGui::Render();
 }
+#endif

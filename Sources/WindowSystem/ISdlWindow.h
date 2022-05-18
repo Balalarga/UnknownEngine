@@ -43,11 +43,13 @@ public:
     virtual void Clear();
     virtual void Render() = 0;
     virtual void PostRender();
-    
+
+#if USE_IMGUI
     virtual void ClearImGui();
     virtual void RenderImGui();
     virtual void PostRenderImGui();
-    
+#endif
+
     inline SDL_Window* GetSdlWindow() const { return SDLWindow; }
     inline const ISdlWindowParams& GetParams() const { return Params; }
 

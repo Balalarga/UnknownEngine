@@ -32,9 +32,10 @@ set(LIBS ${LIBS} SDL2main SDL2 SDL2_image SDL2_ttf)
 set(BINARIES ${BINARIES} ${SDL2_DIR}/bin)
 
 
-set(USE_IMGUI ON)
+set(USE_IMGUI OFF)
 if (${USE_IMGUI})
 # ImGui setup
+    add_compile_definitions(USE_IMGUI=1)
     add_library(ImGui
             # Main Imgui files
             ${THIRDPARTY_DIR}/ImGui/imgui.cpp
@@ -47,6 +48,8 @@ if (${USE_IMGUI})
     target_include_directories(ImGui PUBLIC ${THIRDPARTY_DIR}/ImGui/ ${THIRDPARTY_DIR}/ImGui/backends/)
     target_link_libraries(ImGui ${LIBS})
     set(LIBS ${LIBS} ImGui)
+else()
+    add_compile_definitions(USE_IMGUI=0)
 endif()
 
 
