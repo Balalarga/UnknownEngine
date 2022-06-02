@@ -1,13 +1,11 @@
 #include <iostream>
-#include <SDL_syswm.h>
-
-#include "OpenGL/Core/Scene.h"
 #include "WindowSystem/OpenglWindow.h"
 
 using namespace std;
 
 
-std::string vShaderCode = R"(#version 330
+std::string vshader = R"(
+#version 330
 
 layout(location = 0)in vec3 iVert;
 layout(location = 1)in vec4 iVertColor;
@@ -20,39 +18,32 @@ void main()
     vertColor = iVertColor;
 }
 )";
-std::string fShaderCode = R"(#version 330
+std::string fshader = R"(
+#version 330
 
 in vec4 vertColor;
 out vec4 fragColor;
 
 void main()
 {
+    fragColor = vec4(0.5, 0.1, 0.1, 1.0);
     fragColor = vertColor;
 }
 )";
 
-ShaderPart vShader(ShaderPart::Type::Vertex, vShaderCode);
-ShaderPart fShader(ShaderPart::Type::Fragment, fShaderCode);
-Shader shader(&vShader, &fShader);
 
-void BaseInput(ISdlWindow& window)
+void BaseInput(ISdlWindow* Window)
 {
     InputSystem::Get().Add(SDL_SCANCODE_ESCAPE,
-        [&window](KeyState state)
+        [&Window](KeyState state)
         {
             if (state == KeyState::Pressed)
-                window.Close();
+                Window->Close();
         });
 }
 
-void BaseObjects(Scene& scene)
+void BaseObjects(OpenglWindow* Window)
 {
-    if (!shader.Compile(true))
-    {
-        std::cout<<"Shader compilation error\n";
-        return;
-    }
-    
     struct {
         float x, y, z;
         float r, g, b, a;
@@ -62,31 +53,23 @@ void BaseObjects(Scene& scene)
         { 0.0f,  0.0f, 0.f, 1.f, 0.f, 0.f, 1.f},
     };
     Buffer buffer(DataPtr(triangle, sizeof(triangle)/sizeof(triangle[0]), sizeof(triangle[0])), BufferLayout().Float(3).Float(4));
-    auto& Obj = scene.AddObject(new IRenderable(buffer));
-    Obj.SetShader(&shader);
+    auto* Obj1 = Window->AddObject(new IRenderable(buffer));
+    Obj1->SetShader(std::make_shared<Shader>(vshader, fshader));
 }
 
 int main(int argc, char** argv)
 {
-    ISdlWindowParams params;
-    params.vsync = true;
+    ISdlWindowParams Params;
+    Params.Vsync = true;
     
-    OpenglWindow window(params);
-    {
-        Scene scene;
+    std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
+    Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
     
-        window.SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
-    
-        window.SetScene(&scene);
-        BaseInput(window);
-        BaseObjects(scene);
+    BaseInput(Window.get());
+    BaseObjects(Window.get());
 
-        window.Show();
-    }
-    shader.Destroy();
-    vShader.Destroy();
-    fShader.Destroy();
-    
+    Window->Show();
+
     return 0;
 }
 
