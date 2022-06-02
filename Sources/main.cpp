@@ -29,6 +29,6 @@ int main(int argc, char** argv)
     BaseInput(Window.get());
     
     Window->Show();
-
+    
     return 0;
 }

@@ -41,14 +41,15 @@ else()
     set(ADDITIONAL_LINK_DIRS ${ADDITIONAL_LINK_DIRS} ${SDL_DIR}/lib/MinGW/x64)
 endif()
 
-add_subdirectory(${THIRDPARTY_DIR}/SDL_ttf SDL_ttf)
-set(ADDITIONAL_INCLUDE_DIRS ${ADDITIONAL_INCLUDE_DIRS} ${THIRDPARTY_DIR}/SDL_ttf)
-set(PROJECT_LIBS ${PROJECT_LIBS} SDL2_ttf)
-
 # FMT setup
 add_subdirectory(${THIRDPARTY_DIR}/fmt fmt)
 set(ADDITIONAL_INCLUDE_DIRS ${ADDITIONAL_INCLUDE_DIRS} ${THIRDPARTY_DIR}/fmt/include)
 set(PROJECT_LIBS ${PROJECT_LIBS} fmt)
+
+# RapidJson setup
+add_subdirectory(${THIRDPARTY_DIR}/RapidJson RapidJson)
+set(ADDITIONAL_INCLUDE_DIRS ${ADDITIONAL_INCLUDE_DIRS} ${THIRDPARTY_DIR}/RapidJson/include)
+
 
 set(USE_IMGUI ON)
 if (${USE_IMGUI})
