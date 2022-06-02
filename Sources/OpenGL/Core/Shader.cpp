@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+#include "OpenGL/ErrorHandle.h"
+
 
 Shader::Shader(const std::string &vertexCode,
                const std::string &fragmentCode,
@@ -40,7 +42,7 @@ bool Shader::HasErrors(unsigned shaderId)
 void Shader::Destroy()
 {
     Unbind();
-    glDeleteProgram(Handler);
+    GLCall(glDeleteProgram(Handler))
 }
 
 Shader::~Shader()
@@ -108,8 +110,8 @@ bool Shader::Compile()
         const unsigned id = glCreateShader(type);
         const char* rawSource = code.c_str();
 
-        glShaderSource(id, 1, &rawSource, 0);
-        glCompileShader(id);
+        GLCall(glShaderSource(id, 1, &rawSource, 0))
+        GLCall(glCompileShader(id))
 
         if (HasErrors(id))
         {
@@ -125,28 +127,28 @@ bool Shader::Compile()
             return false;
         }
 
-        attachedShaders.push_back(Handler);
-        glAttachShader(Handler, id);
+        attachedShaders.push_back(id);
+        GLCall(glAttachShader(Handler, id))
     }
 
-    glLinkProgram(Handler);
+    GLCall(glLinkProgram(Handler))
 
     for (auto& i: attachedShaders)
     {
-        glDetachShader(Handler, i);
-        glDeleteShader(i);
+        GLCall(glDetachShader(Handler, i))
+        GLCall(glDeleteShader(i))
     }
     return true;
 }
 
 void Shader::Bind() const
 {
-    glUseProgram(Handler);
+    GLCall(glUseProgram(Handler))
 }
 
 void Shader::Unbind() const
 {
-    glUseProgram(0);
+    GLCall(glUseProgram(0))
 }
 
 bool Shader::UpdateVertexShader(const std::string& code)
@@ -175,7 +177,7 @@ void Shader::SetUniform(const std::string &name, const int &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniform1i(loc, value);
+        GLCall(glUniform1i(loc, value))
     }
 }
 
@@ -184,7 +186,7 @@ void Shader::SetUniform(const std::string &name, const float &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniform1f(loc, value);
+        GLCall(glUniform1f(loc, value))
     }
 }
 
@@ -193,7 +195,7 @@ void Shader::SetUniform(const std::string &name, const glm::vec2 &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniform2f(loc, value.x, value.y);
+        GLCall(glUniform2f(loc, value.x, value.y))
     }
 }
 
@@ -202,7 +204,7 @@ void Shader::SetUniform(const std::string &name, const glm::vec3 &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniform3f(loc, value.x, value.y, value.z);
+        GLCall(glUniform3f(loc, value.x, value.y, value.z))
     }
 }
 
@@ -211,7 +213,7 @@ void Shader::SetUniform(const std::string &name, const glm::vec4 &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniform4f(loc, value.x, value.y, value.z, value.w);
+        GLCall(glUniform4f(loc, value.x, value.y, value.z, value.w))
     }
 }
 
@@ -220,7 +222,7 @@ void Shader::SetUniform(const std::string &name, const glm::mat4 &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]);
+        GLCall(glUniformMatrix4fv(loc, 1, GL_FALSE, &value[0][0]))
     }
 }
 
@@ -229,7 +231,7 @@ void Shader::SetUniform(const std::string &name, const glm::mat3 &value)
     int loc = GetUniformLoc(name);
     if (loc >= 0)
     {
-        glUniformMatrix3fv(loc, 1, GL_FALSE, &value[0][0]);
+        GLCall(glUniformMatrix3fv(loc, 1, GL_FALSE, &value[0][0]))
     }
 }
 

@@ -16,10 +16,10 @@ ISdlWindow::ISdlWindow(const ISdlWindowParams& params):
         return;
 
     SDLWindow = SDL_CreateWindow(Params.Title.c_str(),
-            Params.X,
-            Params.Y,
-            Params.Width,
-            Params.Height,
+            static_cast<int>(Params.X),
+            static_cast<int>(Params.Y),
+            static_cast<int>(Params.Width),
+            static_cast<int>(Params.Height),
             Params.Flags);
     
     if (Params.Vsync)
@@ -38,6 +38,7 @@ ISdlWindow::~ISdlWindow()
     ImGui::DestroyContext();
 #endif
     SDL_DestroyWindow(SDLWindow);
+    SDL_Quit();
 }
 
 void ISdlWindow::SetBackgroundColor(const glm::vec4 newColor)
@@ -54,9 +55,6 @@ void ISdlWindow::Show()
         SDL_Event event;
         while (SDL_PollEvent(&event))
             HandleEvents(event);
-
-        if (bShouldClose)
-            break;
 
 #if USE_IMGUI
         ClearImGui();
@@ -87,12 +85,12 @@ void ISdlWindow::HandleEvents(SDL_Event& event)
             bShouldClose = true;
             break;
         case SDL_WINDOWEVENT:
-            bShouldClose = event.window.event == SDL_WINDOWEVENT_CLOSE &&
-                event.window.windowID == SDL_GetWindowID(SDLWindow);
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(SDLWindow))
+                bShouldClose = true;
             break;
         case SDL_KEYDOWN:
             Input.OnStateChange(event.key.keysym.scancode,
-                    event.key.repeat == 0 ? KeyState::Pressed : KeyState::Repeated);
+                event.key.repeat == 0 ? KeyState::Pressed : KeyState::Repeated);
             break;
         case SDL_KEYUP:
             Input.OnStateChange(event.key.keysym.scancode, KeyState::Released);

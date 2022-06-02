@@ -1,5 +1,6 @@
 #include "Buffer.h"
 
+#include "OpenGL/ErrorHandle.h"
 
 
 DataPtr::DataPtr():
@@ -30,20 +31,20 @@ bool Buffer::Create(unsigned& handler)
     if (!Data.Ptr)
         return false;
 
-    glGenBuffers(1, &handler);
-    glBindBuffer(Type, handler);
-    glBufferData(Type, Data.Count * Data.ItemSize, Data.Ptr, Mode);
+    GLCall(glGenBuffers(1, &handler))
+    GLCall(glBindBuffer(Type, handler))
+    GLCall(glBufferData(Type, Data.Count * Data.ItemSize, Data.Ptr, Mode))
 
     size_t offset = 0;
     for (size_t i = 0; i < Layout.Variables.size(); ++i)
     {
-        glEnableVertexAttribArray(i);
-        glVertexAttribPointer(i,
+        GLCall(glEnableVertexAttribArray(i))
+        GLCall(glVertexAttribPointer(i,
                               Layout.Variables[i].Count,
                               Layout.Variables[i].Type,
                               Layout.Variables[i].Normalized ? GL_FALSE : GL_TRUE,
                               Layout.Size,
-                              (void*)offset);
+                              (void*)offset))
         offset += Layout.Variables[i].Size * Layout.Variables[i].Count;
     }
     return true;

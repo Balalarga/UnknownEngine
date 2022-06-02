@@ -35,6 +35,7 @@ OpenglWindow::OpenglWindow(const ISdlWindowParams& params):
 
 OpenglWindow::~OpenglWindow()
 {
+    RenderObjects.clear();
     SDL_GL_DeleteContext(GlContext);
 #if USE_IMGUI
     ImGui_ImplOpenGL3_Shutdown();

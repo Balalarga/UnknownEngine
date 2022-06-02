@@ -19,7 +19,8 @@ public:
 
     void SetShader(std::shared_ptr<Shader> shader) { ShaderPtr = shader; }
     inline Shader* GetShader() { return ShaderPtr.get(); }
-
+    void Bind();
+    void Release();
 
 private:
     Buffer Vbo;

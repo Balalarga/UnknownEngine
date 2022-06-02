@@ -10,7 +10,7 @@ class OpenglWindow: public ISdlWindow
 {
 public:
     OpenglWindow(const ISdlWindowParams& params = ISdlWindowParams());
-    ~OpenglWindow();
+    ~OpenglWindow() override;
 
     IRenderable* AddObject(IRenderable*&& Obj);
 

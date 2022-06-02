@@ -3,31 +3,43 @@
 #include <assert.h>
 #include <iostream>
 
+#include "OpenGL/ErrorHandle.h"
+
 
 IRenderable::IRenderable(const Buffer &vbo):
     Vbo(vbo),
     Handler(0),
     ModelMatrix(glm::mat4(1.f))
 {
-    glGenVertexArrays(1, &Handler);
-    glBindVertexArray(Handler);
+    GLCall(glGenVertexArrays(1, &Handler))
+    GLCall(glBindVertexArray(Handler))
 
     unsigned vboId;
     bool vboCreated = Vbo.Create(vboId);
 
-    glBindVertexArray(0);
+    GLCall(glBindVertexArray(0))
     if (vboCreated)
-        glDeleteBuffers(1, &vboId);
+        GLCall(glDeleteBuffers(1, &vboId))
 }
 
 IRenderable::~IRenderable()
 {
-    glDeleteVertexArrays(1, &Handler);
+    Release();
+    GLCall(glDeleteVertexArrays(1, &Handler))
 }
 
 void IRenderable::Render()
 {
-    glBindVertexArray(Handler);
-    glDrawArrays(Vbo.DrawType, 0, Vbo.Data.Count);
+    Bind();
+    GLCall(glDrawArrays(Vbo.DrawType, 0, Vbo.Data.Count))
 }
 
+void IRenderable::Bind()
+{
+    GLCall(glBindVertexArray(Handler))
+}
+
+void IRenderable::Release()
+{
+    GLCall(glBindVertexArray(0))
+}
