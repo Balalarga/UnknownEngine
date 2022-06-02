@@ -4,9 +4,8 @@
 #include <chrono>
 
 
-class Log
+struct Log
 {
-public:
 	Log() = delete;
 	Log(const Log&) = delete;
 
@@ -38,7 +37,35 @@ public:
 		Print("Error", message, args...);
 	}
 
-	static const std::string& GetPrintTemplate() { return PrintTemplate; }
+#define ScopedLog(msg, ...) ScopedMessage ScopMsg##__LINE__(msg, __VA_ARGS__)
+	template<class... Args>
+	struct ScopedMessage
+	{
+		ScopedMessage(const std::string& message, Args&&... args):
+			fullMessage(fmt::format(message, args...))
+		{
+			Print("ScopedStart", fullMessage);
+		}
+		ScopedMessage(ScopedMessage&&) = delete;
+		ScopedMessage(const ScopedMessage&) = delete;
+		ScopedMessage& operator=(ScopedMessage&&) = delete;
+		ScopedMessage& operator=(const ScopedMessage&) = delete;
+		
+		~ScopedMessage()
+		{
+			Print("ScopedEnd", fullMessage);
+		}
+		
+	private:
+		const std::string fullMessage;
+	};
+
+	static const std::string& GetPrintTemplate() { return PrintTemplate; } 
+	/**
+	 *  {0} - time from app start
+	 *	{1} - verbosity
+	 *	{2} - formatted message
+	 */
 	static void SetPrintTemplate(const std::string& newTemplate) { PrintTemplate = newTemplate; }
 
 	

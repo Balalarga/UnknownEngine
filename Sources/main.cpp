@@ -19,17 +19,16 @@ void BaseInput(ISdlWindow* Window)
 
 int main(int argc, char** argv)
 {
+    Log::ScopedLog("App lifetime");
+    
     ISdlWindowParams Params;
     Params.Vsync = true;
-    Log::Info("App start");
     std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
     Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
     
     BaseInput(Window.get());
-
+    
     Window->Show();
 
-    Log::Info("App end");
     return 0;
 }
-
