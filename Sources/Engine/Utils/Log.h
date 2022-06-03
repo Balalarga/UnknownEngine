@@ -37,7 +37,7 @@ struct Log
 		Print("Error", message, args...);
 	}
 
-#define ScopedLog(msg, ...) ScopedMessage ScopMsg##__LINE__(msg, __VA_ARGS__)
+#define ScopedLog(msg, ...) ScopedMessage ScopMsg##__LINE__(msg, ##__VA_ARGS__)
 	template<class... Args>
 	struct ScopedMessage
 	{
@@ -60,10 +60,10 @@ struct Log
 		const std::string fullMessage;
 	};
 
-	static const std::string& GetPrintTemplate() { return PrintTemplate; } 
+	static const std::string& GetPrintTemplate() { return PrintTemplate; }
 	/**
-	 *  {0} - time from app start
-	 *	{1} - verbosity
+	 *  {0} - time from app start, 
+	 *	{1} - verbosity, 
 	 *	{2} - formatted message
 	 */
 	static void SetPrintTemplate(const std::string& newTemplate) { PrintTemplate = newTemplate; }

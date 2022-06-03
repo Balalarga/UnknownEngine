@@ -79,11 +79,6 @@ target_link_directories(${PROJECT_NAME} PRIVATE ${ADDITIONAL_LINK_DIRS})
 target_link_libraries(${PROJECT_NAME} ${PROJECT_LIBS})
 target_include_directories(${PROJECT_NAME} PRIVATE Sources ${ADDITIONAL_INCLUDE_DIRS})
 
-# Update solution
-if (MSVC)
-    add_custom_command(TARGET ${PROJECT_NAME} PRE_BUILD COMMAND cmd ${CMAKE_SOURCE_DIR}/GenerateVsProject.bat)
-endif()
-
 if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json)
     configure_file(${CMAKE_CURRENT_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json COPYONLY)
 endif()

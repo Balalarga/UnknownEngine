@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "Engine/Utils/Log.h"
+#include "OpenGL/Core/Scene.h"
 #include "WindowSystem/OpenglWindow.h"
 
 using namespace std;
@@ -22,11 +23,13 @@ int main(int argc, char** argv)
     Log::ScopedLog("App lifetime");
     
     ISdlWindowParams Params;
-    Params.Vsync = true;
+    Params.vsync = true;
     std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
-    Window->SetBackgroundColor(glm::vec4(0.6, 0.6, 0.6, 1.0));
     
     BaseInput(Window.get());
+
+    Scene scene;
+    Window->SetScene(&scene);
     
     Window->Show();
     
