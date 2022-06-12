@@ -1,10 +1,12 @@
 #include <iostream>
 
+#include "Engine/Resources/ShaderStorage.h"
 #include "Engine/Utils/Log.h"
 #include "OpenGL/Core/Scene.h"
 #include "WindowSystem/OpenglWindow.h"
 
 using namespace std;
+
 
 const std::string sDefaultVertexShader = R"(#version 330
 
@@ -30,14 +32,33 @@ void main()
 })";
 
 
+bool LoadShaders()
+{
+    auto& storage = ShaderStorage::Self();
+    auto vsh = storage.LoadShaderPart("devault_vertex", ShaderPart::Type::Vertex, sDefaultVertexShader);
+    if (!vsh)
+        return false;
+    
+    auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, sDefaultFragmentShader);
+    if (!fsh)
+        return false;
+
+    auto shader = storage.LoadShader("default",{vsh, fsh});
+    if (!shader)
+        return false;
+
+    return true;
+}
+
+
 void BaseObjects(Scene& scene)
 {
-    DEFINE_LAYOUT(TriangleLayout)
-        LAYOUT_FIELD(pos, glm::fvec3)
-        LAYOUT_ARRAY(color, glm::fvec4)
-    FINISH_LAYOUT()
-    
-    vector<> triangle
+    struct Vertex
+    {
+        glm::fvec3 pos;
+        glm::fvec4 color;
+    };
+    vector<Vertex> triangle
     {
         {glm::fvec3{-0.2f, -0.4f, 0.f}, glm::fvec4{1.f, 0.f, 0.f, 1.f}},
         {glm::fvec3{-0.2f,  0.4f, 0.f}, glm::fvec4{0.f, 1.f, 0.f, 1.f}},
@@ -46,18 +67,9 @@ void BaseObjects(Scene& scene)
     Buffer buffer(DataPtr(triangle), BufferLayout().Float(3).Float(4));
     
     auto& Obj1 = scene.AddObject(new IRenderable(buffer));
-    std::shared_ptr<Shader> shader(new Shader);
-    shader->Setup({
-        std::make_shared<ShaderPart>(ShaderPart::Type::Vertex, sDefaultVertexShader),
-        std::make_shared<ShaderPart>(ShaderPart::Type::Fragment, sDefaultFragmentShader),
-    });
-    
-    if (!shader->Compile(true))
-    {
-        Log::Error("Shader compilation error");
+    auto shader = ShaderStorage::Self().GetShader("default");
+    if (!shader)
         return;
-    }
-    
     Obj1.SetShader(shader);
 }
 
@@ -75,12 +87,14 @@ void BaseInput(ISdlWindow* Window)
 
 int main(int argc, char** argv)
 {
-    Log::ScopedLog("App lifetime");
+    // Log::ScopedLog("App lifetime");
     
     ISdlWindowParams Params;
     Params.vsync = true;
     std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
-    
+
+    if (!LoadShaders())
+        return -1;
     BaseInput(Window.get());
 
     Scene scene;
@@ -88,6 +102,8 @@ int main(int argc, char** argv)
     Window->SetScene(&scene);
     
     Window->Show();
+    
+    ShaderStorage::Destroy();
     
     return 0;
 }
