@@ -8,16 +8,6 @@ struct Log
 {
 	Log() = delete;
 	Log(const Log&) = delete;
-
-	template<class... Args>
-	static void Print(const std::string& verbosity, const std::string& message, Args&&... args)
-	{
-		using namespace std::chrono;
-		fmt::print(PrintTemplate,
-			duration_cast<milliseconds>(system_clock::now() - AppStartTime).count() / 1000.f,
-			verbosity,
-			fmt::format(message, args...));
-	}
 	
 	template<class... Args>
 	static void Info(const std::string& message, Args&&... args)
@@ -32,9 +22,19 @@ struct Log
 	}
 	
 	template<class... Args>
-	static void Error(const std::string& message, Args&&... args)
+	static void Error(const std:cd ..:string& message, Args&&... args)
 	{
 		Print("Error", message, args...);
+	}
+
+	template<class... Args>
+	static void Print(const std::string& verbosity, const std::string& message, Args&&... args)
+	{
+		using namespace std::chrono;
+		fmt::print(PrintTemplate,
+			duration_cast<milliseconds>(system_clock::now() - AppStartTime).count() / 1000.f,
+			verbosity,
+			fmt::format(message, args...));
 	}
 
 #define ScopedLog(msg, ...) ScopedMessage ScopMsg##__LINE__(msg, ##__VA_ARGS__)

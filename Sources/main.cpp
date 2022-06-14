@@ -4,6 +4,7 @@
 #include "Engine/Utils/Log.h"
 #include "OpenGL/Core/Scene.h"
 #include "WindowSystem/OpenglWindow.h"
+#include "Engine/Utils/Checks.h"
 
 using namespace std;
 
@@ -36,16 +37,13 @@ bool LoadShaders()
 {
     auto& storage = ShaderStorage::Self();
     auto vsh = storage.LoadShaderPart("devault_vertex", ShaderPart::Type::Vertex, sDefaultVertexShader);
-    if (!vsh)
-        return false;
+    CheckReturn(vsh, false);
     
     auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, sDefaultFragmentShader);
-    if (!fsh)
-        return false;
+    CheckReturn(fsh, false);
 
     auto shader = storage.LoadShader("default",{vsh, fsh});
-    if (!shader)
-        return false;
+    CheckReturn(shader, false);
 
     return true;
 }
@@ -68,8 +66,7 @@ void BaseObjects(Scene& scene)
     
     auto& Obj1 = scene.AddObject(new IRenderable(buffer));
     auto shader = ShaderStorage::Self().GetShader("default");
-    if (!shader)
-        return;
+    CheckMsgReturn(!shader, "Shader not compiled");
     Obj1.SetShader(shader);
 }
 
@@ -87,14 +84,14 @@ void BaseInput(ISdlWindow* Window)
 
 int main(int argc, char** argv)
 {
-    // Log::ScopedLog("App lifetime");
+    Log::ScopedLog("App lifetime");
     
     ISdlWindowParams Params;
     Params.vsync = true;
     std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
 
-    if (!LoadShaders())
-        return -1;
+    CheckReturn(LoadShaders(), -1);
+    
     BaseInput(Window.get());
 
     Scene scene;
