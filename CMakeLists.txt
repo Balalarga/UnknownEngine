@@ -73,7 +73,16 @@ endif()
 
 # Find all source files
 file(GLOB_RECURSE PROJECT_SOURCES Sources/*.cpp Sources/*.h Sources/*.hpp)
-add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${ADDITIONAL_SOURCES})
+
+# Resources folder
+set(RESOURCES_DIR ${CMAKE_SOURCE_DIR}/Resources)
+# Find all resources
+file(GLOB_RECURSE RESOURCE_FILES ${RESOURCES_DIR}/*)
+
+add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${ADDITIONAL_SOURCES} ${RESOURCE_FILES})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE "RESOURCES_FOLDER_PATH=\"${RESOURCES_DIR}\"")
+set_target_properties(${PROJECT_NAME} PROPERTIES RESOURCE "${RESOURCE_FILES}")
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${ADDITIONAL_LINK_DIRS})
 target_link_libraries(${PROJECT_NAME} ${PROJECT_LIBS})

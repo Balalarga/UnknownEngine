@@ -22,7 +22,7 @@ struct Log
 	}
 	
 	template<class... Args>
-	static void Error(const std:cd ..:string& message, Args&&... args)
+	static void Error(const std::string& message, Args&&... args)
 	{
 		Print("Error", message, args...);
 	}
