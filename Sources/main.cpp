@@ -4,6 +4,8 @@
 #include "Engine/Utils/Log.h"
 #include "WindowSystem/OpenglWindow.h"
 
+#include "Engine/GameFramework/Objects/Actor.h"
+
 using namespace std;
 
 
@@ -11,14 +13,16 @@ int main(int argc, char** argv)
 {
     Log::ScopedLog("App lifetime");
     
-    ISdlWindowParams Params;
-    Params.vsync = true;
-    std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(Params);
+    ISdlWindowParams params;
+    params.vsync = true;
+    std::shared_ptr<OpenglWindow> Window = std::make_shared<OpenglWindow>(params);
 
+    GameMock game(Window.get());
+    game.Init();
+    game.Run();
 
-    GameMock Game(Window.get());
-    Game.Init();
-    Game.Run();
-    
+    Unk::Actor obj;
+    Unk::Component& component = obj.Add<Unk::Component>();
+
     return 0;
 }

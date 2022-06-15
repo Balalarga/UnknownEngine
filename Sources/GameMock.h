@@ -9,7 +9,7 @@
 #include "OpenGL/Core/Scene.h"
 
 
-class GameMock: public Game
+class GameMock: public Unk::Game
 {
 public:
 	GameMock(ISdlWindow* window):
@@ -66,13 +66,13 @@ public:
 		std::string defaultFragmentShader = FileSystem::ReadResource("Shaders/default.fsh");
 		auto vsh = storage.LoadShaderPart("devault_vertex", ShaderPart::Type::Vertex, defaultVertexShader);
 		CheckReturn(vsh, false);
-    
+		
 		auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, defaultFragmentShader);
 		CheckReturn(fsh, false);
-
+		
 		auto shader = storage.LoadShader("default",{vsh, fsh});
 		CheckReturn(shader, false);
-    
+		
 		return true;
 	}
 };

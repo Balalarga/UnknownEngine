@@ -8,7 +8,9 @@
 class Scene;
 class ISdlWindow;
 
-
+namespace Unk
+{
+	
 class Game
 {
 public:
@@ -50,3 +52,5 @@ private:
 	
 	std::map<std::string, std::shared_ptr<Scene>> _scenes;
 };
+
+}

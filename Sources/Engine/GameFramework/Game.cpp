@@ -3,6 +3,10 @@
 #include "Engine/Resources/ShaderStorage.h"
 #include "WindowSystem/ISdlWindow.h"
 
+
+namespace Unk
+{
+	
 Game::Game(ISdlWindow* window):
 	_window(window)
 {
@@ -30,4 +34,6 @@ bool Game::SwitchScene(const std::string& sceneName)
 	
 	_window->SetScene(scene.get());
 	return true;
+}
+
 }
