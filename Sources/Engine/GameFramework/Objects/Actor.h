@@ -12,6 +12,7 @@ namespace Unk
 class Actor
 {
 public:
+	Actor() = default;
 	virtual ~Actor();
 	
 	template<class T, class ...TArgs>
@@ -21,7 +22,7 @@ public:
 	T* GetComponent();
 
 	template<class T>
-	bool HasComponent() const;
+	inline bool HasComponent() const;
 
 
 private:
@@ -47,9 +48,10 @@ T* Actor::GetComponent()
 }
 
 template <class T>
-bool Actor::HasComponent() const
+inline bool Actor::HasComponent() const
 {
 	return GetComponent<T>() != nullptr;
 }
+
 
 }

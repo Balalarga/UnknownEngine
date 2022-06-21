@@ -43,20 +43,30 @@ public:
 			glm::fvec3 pos;
 			glm::fvec4 color;
 		};
+		
 		std::vector<Vertex> triangle
 		{
-	            {glm::fvec3{-0.2f, -0.4f, 0.f}, glm::fvec4{1.f, 0.f, 0.f, 1.f}},
-				{glm::fvec3{-0.2f,  0.4f, 0.f}, glm::fvec4{0.f, 1.f, 0.f, 1.f}},
-				{glm::fvec3{ 0.3f,  0.0f, 0.f}, glm::fvec4{0.f, 0.f, 1.f, 1.f}},
-			};
+            {glm::fvec3{-0.2f, -0.4f, 0.f}, glm::fvec4{1.f, 0.f, 0.f, 1.f}},
+			{glm::fvec3{-0.2f,  0.4f, 0.f}, glm::fvec4{0.f, 1.f, 0.f, 1.f}},
+			{glm::fvec3{ 0.3f,  0.0f, 0.f}, glm::fvec4{0.f, 0.f, 1.f, 1.f}},
+		};
+		
+		std::vector<Vertex> triangle2
+		{
+            {glm::fvec3{-0.2f-0.5f, -0.4f, 0.f}, glm::fvec4{1.f, 0.f, 0.f, 1.f}},
+			{glm::fvec3{-0.2f-0.5f,  0.4f, 0.f}, glm::fvec4{0.f, 1.f, 0.f, 1.f}},
+			{glm::fvec3{ 0.3f-0.5f,  0.0f, 0.f}, glm::fvec4{0.f, 0.f, 1.f, 1.f}},
+		};
 		Buffer buffer(DataPtr(triangle), BufferLayout().Float(3).Float(4));
+		Buffer buffer2(DataPtr(triangle2), BufferLayout().Float(3).Float(4));
 
 		auto& Obj1 = mainScene->AddObject(new IRenderable(buffer));
+		auto& Obj2 = mainScene->AddObject(new IRenderable(buffer2));
 		auto shader = ShaderStorage::Self().GetShader("default");
-
 		CheckMsgReturn(shader, "Shader not compiled");
 
 		Obj1.SetShader(shader);
+		Obj2.SetShader(shader);
 	}
     
 	bool LoadShaders()
