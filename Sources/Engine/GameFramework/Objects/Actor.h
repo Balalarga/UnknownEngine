@@ -16,7 +16,12 @@ public:
 	virtual ~Actor();
 	
 	template<class T, class ...TArgs>
-	T& Add(TArgs&& ...args);
+	T* Add(TArgs&&... args)
+	{
+		T* comp = new T(std::forward(*this, args)...);
+		_components.emplace(std::make_pair(&typeid(T), comp));
+		return comp;
+	}
 
 	template<class T>
 	T* GetComponent();
@@ -26,17 +31,9 @@ public:
 
 
 private:
-    std::map<const type_info*, std::unique_ptr<Component>> _components;
+    std::map<type_info*, std::unique_ptr<Component>> _components;
 };
 
-
-
-template <class T, class ... TArgs>
-T& Actor::Add(TArgs&&... args)
-{
-	T& component = *_components.emplace(&typeid(T), std::make_unique<T>(args...)).first->second; 
-	return component;
-}
 
 template <class T>
 T* Actor::GetComponent()
