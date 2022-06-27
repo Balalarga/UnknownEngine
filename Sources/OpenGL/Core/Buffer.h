@@ -11,7 +11,7 @@ struct DataPtr
     
     template<class T>
     DataPtr(const std::vector<T>& items):
-        DataPtr((void*)&items[0], items.size(), sizeof(T))
+        DataPtr((void*)&items[0], items.size(), sizeof(items[0]))
     {}
     template<class T>
     DataPtr(const std::initializer_list<T>& items):

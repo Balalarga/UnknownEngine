@@ -47,15 +47,11 @@ public:
 		std::shared_ptr<Scene> mainScene = AddAndSwitchScene<Scene>("Default");
 		
 		auto shader = ShaderStorage::Self().GetShader("default");
-		CheckMsgReturn(shader, "Shader not compiled");
+		CheckMsgReturn(shader, "Shader not compiled")
 
-		Unk::Actor& actor = actors.emplace_back();
+		Unk::Actor& actor = *actors.emplace_back(std::make_unique<Unk::Actor>());
 		Unk::ColorRectComponent* rectComp = actor.Add<Unk::ColorRectComponent>(mainScene.get());
-		
-		rectComp->GetRenderable().SetShader(shader);
-
-		std::map<float, char> s;
-		s.emplace(std::make_pair(1.f, 'c')).first->second;
+		// rectComp->GetRenderable().SetShader(shader.get());
 	}
     
 	bool LoadShaders()
@@ -64,19 +60,18 @@ public:
 		std::string defaultVertexShader = FileSystem::ReadResource("Shaders/default.vsh");
 		std::string defaultFragmentShader = FileSystem::ReadResource("Shaders/default.fsh");
 		auto vsh = storage.LoadShaderPart("devault_vertex", ShaderPart::Type::Vertex, defaultVertexShader);
-		CheckReturn(vsh, false);
+		CheckReturn(vsh, false)
 		
 		auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, defaultFragmentShader);
-		CheckReturn(fsh, false);
+		CheckReturn(fsh, false)
 		
-		auto shader = storage.LoadShader("default",{vsh, fsh});
-		CheckReturn(shader, false);
+		auto shader = storage.LoadShader("default", vsh.get(), fsh.get());
+		CheckReturn(shader, false)
 		
 		return true;
 	}
-	std::vector<Unk::Actor> actors;
+	std::vector<std::unique_ptr<Unk::Actor>> actors;
 };
-
 
 
 int main(int argc, char** argv)

@@ -18,9 +18,9 @@ public:
 	template<class T, class ...TArgs>
 	T* Add(TArgs&&... args)
 	{
-		T* comp = new T(std::forward(*this, args)...);
-		_components.emplace(std::make_pair(&typeid(T), comp));
-		return comp;
+		_components[&typeid(T)] = std::make_unique<T>(args...);
+		_components[&typeid(T)]->RegisterAt(*this);
+		return static_cast<T*>(_components[&typeid(T)].get());
 	}
 
 	template<class T>
@@ -31,7 +31,7 @@ public:
 
 
 private:
-    std::map<type_info*, std::unique_ptr<Component>> _components;
+    std::map<const type_info*, std::unique_ptr<Component>> _components;
 };
 
 

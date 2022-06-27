@@ -14,13 +14,13 @@ namespace Unk
 class ColorRectComponent: public Component
 {
 public:
-	ColorRectComponent(Actor& owner, Scene* scene, const glm::fvec4& color = glm::fvec4(1));
+	ColorRectComponent(Scene* scene);
 	
 	IRenderable& GetRenderable() { return _rect; }
 	
 	
 private:
-	glm::fvec4 _color;
+	glm::fvec4 _color = glm::fvec4(1);
 	std::vector<float> _rectData;
 	IRenderable& _rect;
 };

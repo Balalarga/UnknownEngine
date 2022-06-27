@@ -17,10 +17,8 @@ static std::vector<float> GenerateRectData(const glm::fvec4& color)
 	};
 };
 
-ColorRectComponent::ColorRectComponent(Actor& owner, Scene* scene, const glm::fvec4& color):
-	Component(owner),
-	_color(color),
-	_rectData(GenerateRectData(color)),
+ColorRectComponent::ColorRectComponent(Scene* scene):
+	_rectData(GenerateRectData(_color)),
 	_rect(scene->AddObject(new IRenderable({DataPtr(_rectData), BufferLayout().Float(3).Float(4)})))
 {
 	

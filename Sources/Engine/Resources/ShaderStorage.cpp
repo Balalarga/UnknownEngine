@@ -35,12 +35,15 @@ bool ShaderStorage::HasShaderPart(const std::string& tag)
 	return GetShaderPart(tag) != nullptr;
 }
 
-std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const std::vector<std::shared_ptr<ShaderPart>>& parts)
+std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, ShaderPart* vShader, ShaderPart* fShader, ShaderPart* gShader)
 {
 	if (auto existingShader = GetShader(tag))
 		return existingShader;
-
-	std::shared_ptr<Shader> shader = std::make_shared<Shader>(parts);
+	
+	if (!vShader || !fShader)
+		return nullptr;
+	
+	std::shared_ptr<Shader> shader = std::make_shared<Shader>(vShader, fShader, gShader);
 	
 	if (!shader->Compile())
 		return nullptr;
@@ -49,20 +52,12 @@ std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const 
 	return shader;
 }
 
-std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const std::vector<std::string>& partNames)
+std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const std::string& vShader, const std::string& fShader, const std::string& gShader)
 {
 	if (auto existingShader = GetShader(tag))
 		return existingShader;
 	
-	std::vector<std::shared_ptr<ShaderPart>> parts;
-	for (auto& i: partNames)
-	{
-		if (auto part = GetShaderPart(i))
-			parts.push_back(part);
-		else
-			return nullptr;
-	}
-	return LoadShader(tag, parts);
+	return LoadShader(tag, GetShaderPart(vShader).get(), GetShaderPart(fShader).get(), GetShaderPart(gShader).get());
 }
 
 std::shared_ptr<Shader> ShaderStorage::GetShader(const std::string& tag)
