@@ -7,7 +7,16 @@
 struct DataPtr
 {
     DataPtr();
-    DataPtr(void* Ptr, unsigned Count, unsigned ItemSize);
+    DataPtr(void* ptr, unsigned count, unsigned itemSize);
+    
+    template<class T>
+    DataPtr(const std::vector<T>& items):
+        DataPtr((void*)&items[0], items.size(), sizeof(T))
+    {}
+    template<class T>
+    DataPtr(const std::initializer_list<T>& items):
+        DataPtr((void*)&items[0], items.size(), sizeof(T))
+    {}
 
     void* Ptr;
     unsigned Count;
@@ -16,7 +25,7 @@ struct DataPtr
 
 struct Buffer
 {
-    Buffer(const DataPtr& data, const BufferLayout& layout = BufferLayout());
+    Buffer(const DataPtr& data = {}, const BufferLayout& layout = BufferLayout());
 
     DataPtr Data;
     BufferLayout Layout;
@@ -24,5 +33,5 @@ struct Buffer
     unsigned Type = GL_ARRAY_BUFFER;
     unsigned Mode = GL_STATIC_DRAW;
 
-    bool Create(unsigned& handler);
+    unsigned Create();
 };

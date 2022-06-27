@@ -7,36 +7,60 @@
 
 
 IRenderable::IRenderable(const Buffer &vbo):
-    Vbo(vbo),
-    Handler(0),
-    ModelMatrix(glm::mat4(1.f))
+    _handler(0),
+    _modelMatrix(glm::mat4(1.f))
 {
-    GLCall(glGenVertexArrays(1, &Handler))
-    GLCall(glBindVertexArray(Handler))
-
-    unsigned vboId;
-    bool vboCreated = Vbo.Create(vboId);
-
-    GLCall(glBindVertexArray(0))
-    if (vboCreated)
-        GLCall(glDeleteBuffers(1, &vboId))
+    Setup(vbo);
 }
 
 IRenderable::~IRenderable()
 {
     Release();
-    GLCall(glDeleteVertexArrays(1, &Handler))
+    GLCall(glDeleteVertexArrays(1, &_handler))
 }
 
 void IRenderable::Render()
 {
+    if ( !_bVisible )
+        return;
+    
     Bind();
-    GLCall(glDrawArrays(Vbo.DrawType, 0, Vbo.Data.Count))
+    GLCall(glDrawArrays(_vbo.DrawType, 0, _vbo.Data.Count))
+}
+
+bool IRenderable::Setup(const Buffer& vbo)
+{
+    if (!vbo.Data.Ptr)
+        return false;
+    
+    _vbo = vbo;
+    
+    GLCall(glGenVertexArrays(1, &_handler))
+    GLCall(glBindVertexArray(_handler))
+
+    unsigned vboId = _vbo.Create();
+    GLCall(glBindVertexArray(0))
+    
+    if (vboId == 0)
+        return false;
+    
+    GLCall(glDeleteBuffers(1, &vboId))
+    return true;
+}
+
+void IRenderable::SetShader(Shader* shader)
+{
+    if (_shaderPtr)
+        _shaderPtr->DetachFrom(this);
+    
+    _shaderPtr = shader;
+    
+    shader->AttachTo(this);
 }
 
 void IRenderable::Bind()
 {
-    GLCall(glBindVertexArray(Handler))
+    GLCall(glBindVertexArray(_handler))
 }
 
 void IRenderable::Release()

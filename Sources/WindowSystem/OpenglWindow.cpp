@@ -1,4 +1,9 @@
-#include "OpenglWindow.h"
+#include"OpenglWindow.h"
+
+#include <GL/glew.h>
+
+#include "OpenGL/Core/IRenderable.h"
+#include "OpenGL/Core/Scene.h"
 
 #if USE_IMGUI
     #include <imgui_impl_sdl.h>
@@ -12,44 +17,40 @@ OpenglWindow::OpenglWindow(const ISdlWindowParams& params):
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
-    GlContext = SDL_GL_CreateContext(GetSdlWindow());
+    _glContext = SDL_GL_CreateContext(GetSdlWindow());
 
     glewExperimental = GL_TRUE;
     if (glewInit() != GLEW_OK)
         return;
 
-    SDL_GL_MakeCurrent(GetSdlWindow(), GlContext);
+    SDL_GL_MakeCurrent(GetSdlWindow(), _glContext);
+    auto backColor = GetBackgroundColor();
+    glClearColor(backColor.r, backColor.g, backColor.b, backColor.a);
 
 #if USE_IMGUI
-    const char* glsl_version = "#version 130";
+    const char* glsl_version = "#version 330";
 
-    ImGui_ImplSDL2_InitForOpenGL(GetSdlWindow(), GlContext);
+    ImGui_ImplSDL2_InitForOpenGL(GetSdlWindow(), _glContext);
     ImGui_ImplOpenGL3_Init(glsl_version);
 #endif
 }
 
 OpenglWindow::~OpenglWindow()
 {
-    RenderObjects.clear();
-    SDL_GL_DeleteContext(GlContext);
+    SDL_GL_DeleteContext(_glContext);
 #if USE_IMGUI
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
 #endif
 }
 
-IRenderable* OpenglWindow::AddObject(IRenderable*&& Obj)
-{
-    RenderObjects.push_back(std::unique_ptr<IRenderable>(Obj));
-    return RenderObjects.back().get();
-}
 
-void OpenglWindow::SetBackgroundColor(const glm::vec4 newColor)
+void OpenglWindow::SetBackgroundColor(const glm::vec4& newColor)
 {
     ISdlWindow::SetBackgroundColor(newColor);
     glClearColor(newColor.r, newColor.g, newColor.b, newColor.a);
@@ -57,13 +58,26 @@ void OpenglWindow::SetBackgroundColor(const glm::vec4 newColor)
 
 void OpenglWindow::Render()
 {
-    for (auto& Obj: RenderObjects)
+    if (Scene* scene = GetScene())
     {
-        Obj->GetShader()->Bind();
-        Obj->Render();
-        Obj->GetShader()->Unbind();
+        for (auto& Obj : scene->GetShaders())
+        {
+            Obj->Bind();
+            Obj->BatchRender();
+            Obj->Unbind();
+        }
     }
     ISdlWindow::Render();
+}
+
+void OpenglWindow::SetVSync(bool enabled)
+{
+    if (enabled)
+        SDL_GL_SetSwapInterval(1);
+    else
+        SDL_GL_SetSwapInterval(0);
+    
+    ISdlWindow::SetVSync(enabled);
 }
 
 #if USE_IMGUI

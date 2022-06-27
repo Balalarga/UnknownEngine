@@ -5,33 +5,80 @@
 
 #include "OpenGL/ErrorHandle.h"
 
+#include "IRenderable.h"
 
-Shader::Shader(const std::string &vertexCode,
-               const std::string &fragmentCode,
-               const std::string &geomertyCode):
-    VertexCode(vertexCode),
-    FragmentCode(fragmentCode),
-    GeometryCode(geomertyCode),
-    Handler(0)
+
+Shader::Shader(ShaderPart* vShader, ShaderPart* fShader, ShaderPart* gShader):
+    _parts({vShader, fShader, gShader})
 {
-    Compile();
+}
+
+Shader::~Shader()
+{
+    Destroy();
+}
+
+void Shader::AttachTo(IRenderable* object)
+{
+    _renderableObjects.emplace(object);
+}
+
+void Shader::DetachFrom(IRenderable* object)
+{
+    _renderableObjects.erase(object);
+}
+
+void Shader::BatchRender()
+{
+    for (auto& obj: _renderableObjects)
+        obj->Render();
+}
+
+bool Shader::Compile(bool bCompileParts)
+{
+    _handler = glCreateProgram();
+
+    std::vector parts{_parts.vShader, _parts.fShader};
+    if (_parts.gShader)
+        parts.push_back(_parts.gShader);
+    
+    std::vector<unsigned> attachedShaders;
+    for (auto& part : parts)
+    {
+        if (!part->IsInited() && (!bCompileParts || !part->Compile()))
+            continue;
+        
+        attachedShaders.push_back(part->GetHandler());
+        GLCall(glAttachShader(_handler, part->GetHandler()))
+    }
+    GLCall(glLinkProgram(_handler))
+    
+    return attachedShaders.size() == parts.size();
+}
+
+void Shader::Bind() const
+{
+    GLCall(glUseProgram(_handler))
+}
+
+void Shader::Unbind() const
+{
+    GLCall(glUseProgram(0))
 }
 
 bool Shader::HasErrors(unsigned shaderId)
 {
     GLint isCompiled = 0;
     glGetShaderiv(shaderId, GL_COMPILE_STATUS, &isCompiled);
-    if(isCompiled == GL_FALSE)
+    if (isCompiled == GL_FALSE)
     {
         GLint maxLength = 0;
         glGetShaderiv(shaderId, GL_INFO_LOG_LENGTH, &maxLength);
 
         std::vector<GLchar> errorLog(maxLength);
         glGetShaderInfoLog(shaderId, maxLength, &maxLength, &errorLog[0]);
-        for(auto i: errorLog)
-        {
+        for (auto i: errorLog)
             std::cout<<i;
-        }
         std::cout<<std::endl;
 
         return true;
@@ -41,38 +88,43 @@ bool Shader::HasErrors(unsigned shaderId)
 
 void Shader::Destroy()
 {
-    Unbind();
-    GLCall(glDeleteProgram(Handler))
-}
+    if (_handler)
+    {
+        Unbind();
+        std::vector parts{_parts.vShader, _parts.fShader};
+        if (_parts.gShader)
+            parts.push_back(_parts.gShader);
 
-Shader::~Shader()
-{
-    Destroy();
+        for (ShaderPart*& p : parts)
+        {
+            GLCall(glDetachShader(_handler, p->GetHandler()))
+        }
+        
+        GLCall(glDeleteProgram(_handler))
+        _handler = 0;
+    }
 }
 
 bool Shader::AddUniform(const std::string &name)
 {
-    Bind();
-    int loc = glGetUniformLocation(Handler, name.c_str());
+    int loc = glGetUniformLocation(_handler, name.c_str());
     if (loc < 0)
     {
         Unbind();
         return false;
     }
 
-    Uniforms[name] = loc;
+    _uniforms[name] = loc;
 
-    Unbind();
     return true;
 }
 
 bool Shader::AddUniforms(const std::vector<std::string> &names)
 {
-    Bind();
     bool allOk = true;
     for (auto& name : names)
     {
-        int loc = glGetUniformLocation(Handler, name.c_str());
+        int loc = glGetUniformLocation(_handler, name.c_str());
 
         if (loc < 0)
         {
@@ -81,95 +133,11 @@ bool Shader::AddUniforms(const std::vector<std::string> &names)
         }
         else
         {
-            Uniforms[name] = loc;
+            _uniforms[name] = loc;
         }
     }
 
-    Unbind();
     return allOk;
-}
-
-
-bool Shader::Compile()
-{
-    std::vector<std::pair<unsigned, const std::string&>> shaders
-    {
-        {GL_VERTEX_SHADER, VertexCode},
-        {GL_FRAGMENT_SHADER, FragmentCode},
-        {GL_GEOMETRY_SHADER, GeometryCode},
-    };
-
-    Handler = glCreateProgram();
-
-    std::vector<unsigned> attachedShaders;
-    for (auto& [type, code]: shaders)
-    {
-        if (code.empty())
-            continue;
-
-        const unsigned id = glCreateShader(type);
-        const char* rawSource = code.c_str();
-
-        GLCall(glShaderSource(id, 1, &rawSource, 0))
-        GLCall(glCompileShader(id))
-
-        if (HasErrors(id))
-        {
-            std::cout << "Shader compilation error\n" << code << std::endl;
-            glDeleteShader(id);
-            for(auto& i: attachedShaders)
-            {
-                glDetachShader(Handler, i);
-                glDeleteShader(i);
-            }
-
-            Destroy();
-            return false;
-        }
-
-        attachedShaders.push_back(id);
-        GLCall(glAttachShader(Handler, id))
-    }
-
-    GLCall(glLinkProgram(Handler))
-
-    for (auto& i: attachedShaders)
-    {
-        GLCall(glDetachShader(Handler, i))
-        GLCall(glDeleteShader(i))
-    }
-    return true;
-}
-
-void Shader::Bind() const
-{
-    GLCall(glUseProgram(Handler))
-}
-
-void Shader::Unbind() const
-{
-    GLCall(glUseProgram(0))
-}
-
-bool Shader::UpdateVertexShader(const std::string& code)
-{
-    Destroy();
-    VertexCode = code;
-    return Compile();
-}
-
-bool Shader::UpdateFragmentShader(const std::string& code)
-{
-    Destroy();
-    FragmentCode = code;
-    return Compile();
-}
-
-bool Shader::UpdateGeomertyShader(const std::string& code)
-{
-    Destroy();
-    GeometryCode = code;
-    return Compile();
 }
 
 void Shader::SetUniform(const std::string &name, const int &value)
@@ -237,6 +205,6 @@ void Shader::SetUniform(const std::string &name, const glm::mat3 &value)
 
 int Shader::GetUniformLoc(const std::string& name)
 {
-    auto it = Uniforms.find(name);
-    return it != Uniforms.end() ? it->second : -1;
+    auto it = _uniforms.find(name);
+    return it != _uniforms.end() ? it->second : -1;
 }

@@ -26,17 +26,18 @@ Buffer::Buffer(const DataPtr& data, const BufferLayout& layout):
 
 }
 
-bool Buffer::Create(unsigned& handler)
+unsigned Buffer::Create()
 {
+    unsigned handler = 0;
     if (!Data.Ptr)
-        return false;
-
+        return handler;
+    
     GLCall(glGenBuffers(1, &handler))
     GLCall(glBindBuffer(Type, handler))
     GLCall(glBufferData(Type, Data.Count * Data.ItemSize, Data.Ptr, Mode))
 
-    size_t offset = 0;
-    for (size_t i = 0; i < Layout.Variables.size(); ++i)
+    unsigned offset = 0;
+    for (int i = 0; i < Layout.Variables.size(); ++i)
     {
         GLCall(glEnableVertexAttribArray(i))
         GLCall(glVertexAttribPointer(i,
@@ -47,5 +48,6 @@ bool Buffer::Create(unsigned& handler)
                               (void*)offset))
         offset += Layout.Variables[i].Size * Layout.Variables[i].Count;
     }
-    return true;
+    
+    return handler;
 }

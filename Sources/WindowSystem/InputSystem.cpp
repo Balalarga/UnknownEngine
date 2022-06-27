@@ -14,7 +14,7 @@ void InputSystem::Add(SDL_Scancode code, const std::function<void(const KeyState
 
 bool InputSystem::Remove(SDL_Scancode code, const std::function<void(const KeyState&)>& callback)
 {
-    for (size_t i = 0; i < KeyCallbacks[code].size(); ++i)
+    for (int i = 0; i < KeyCallbacks[code].size(); ++i)
     {
         if (KeyCallbacks[code][i].target<void(const KeyState&)>() == callback.target<void(const KeyState&)>())
         {

@@ -12,22 +12,30 @@
 class IRenderable
 {
 public:
-    IRenderable(const Buffer& vbo);
+    IRenderable(const Buffer& vbo = {});
     virtual ~IRenderable();
 
     virtual void Render();
 
-    void SetShader(std::shared_ptr<Shader> shader) { ShaderPtr = shader; }
-    inline Shader* GetShader() { return ShaderPtr.get(); }
+    bool Setup(const Buffer& vbo);
+    
+    void SetShader(Shader* shader);
+    Shader* GetShader() { return _shaderPtr; }
+    
     void Bind();
     void Release();
 
-private:
-    Buffer Vbo;
-    GLuint Handler;
-    std::shared_ptr<Shader> ShaderPtr;
+    void SetVisible(bool bVisible) { _bVisible = bVisible; }
+    
 
-    glm::mat4 ModelMatrix;
+private:
+    bool _bVisible = true;
+    
+    Buffer _vbo;
+    GLuint _handler;
+    Shader* _shaderPtr{};
+
+    glm::mat4 _modelMatrix;
 };
 
 #endif // RENDERABLE_H

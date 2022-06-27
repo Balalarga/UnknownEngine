@@ -1,35 +1,38 @@
 #pragma once
 
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
-
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 
+#include "ShaderPart.h"
+
+
+class IRenderable;
 
 class Shader
 {
 public:
-    Shader(const std::string& vertexCode,
-           const std::string& fragmentCode,
-           const std::string& geomertyCode = "");
+    Shader(ShaderPart* vShader, ShaderPart* fShader, ShaderPart* gShader = nullptr);
     virtual ~Shader();
 
-    bool UpdateVertexShader(const std::string &code);
-    bool UpdateFragmentShader(const std::string &code);
-    bool UpdateGeomertyShader(const std::string &code);
+	void AttachTo(IRenderable* object);
+	void DetachFrom(IRenderable* object);
+	
+	bool IsInited() const { return _handler != 0; }
 
-    bool AddUniform(const std::string& name);
-    bool AddUniforms(const std::vector<std::string>& names);
+	bool Compile(bool bCompileParts = false);
+    void Destroy();
 
-    int GetUniformLoc(const std::string& name);
-
-    bool Compile();
-
+	void BatchRender();
+	
     void Bind() const;
     void Unbind() const;
-
+	
+	bool AddUniform(const std::string& name);
+	bool AddUniforms(const std::vector<std::string>& names);
 
     void SetUniform(const std::string& name, const int& value);
     void SetUniform(const std::string& name, const float& value);
@@ -41,16 +44,21 @@ public:
 
 
 protected:
-    void Destroy();
+    int GetUniformLoc(const std::string& name);
+    
     bool HasErrors(unsigned shaderId);
-
+	
 
 private:
-    std::string VertexCode;
-    std::string FragmentCode;
-    std::string GeometryCode;
-    std::map<std::string, int> Uniforms;
+	struct {
+		ShaderPart* vShader{};
+		ShaderPart* fShader{};
+		ShaderPart* gShader{};
+	} _parts;
+	std::set<IRenderable*> _renderableObjects;
+	
+    std::map<std::string, int> _uniforms;
 
-    GLuint Handler;
+    GLuint _handler = 0;
 };
 

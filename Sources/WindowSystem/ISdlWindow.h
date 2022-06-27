@@ -2,25 +2,29 @@
 #define ISdlWindow_H
 
 #include <string>
+
 #include <SDL.h>
 #include <glm/glm.hpp>
 
 #include "InputSystem.h"
 
 
+class Scene;
+
 struct ISdlWindowParams
 {
     ISdlWindowParams(const std::string& title = "New Window"):
-        Title(title)
+        title(title)
     {}
-    std::string Title;
-    unsigned X = SDL_WINDOWPOS_CENTERED;
-    unsigned Y = SDL_WINDOWPOS_CENTERED;
-    unsigned Width = 800;
-    unsigned Height = 600;
-    unsigned Flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
+    std::string title;
+    unsigned x = SDL_WINDOWPOS_CENTERED;
+    unsigned y = SDL_WINDOWPOS_CENTERED;
+    unsigned width = 800;
+    unsigned height = 600;
+    unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
 
-    bool Vsync = false;
+    bool vsync = false;
+    bool fullScreen = false;
 };
 
 
@@ -33,13 +37,21 @@ public:
     void Show();
     void Close();
 
-    inline const glm::vec4& GetBackgroundColor() { return BackColor; }
-    virtual void SetBackgroundColor(const glm::vec4 newColor);
+    inline const glm::vec4& GetBackgroundColor() { return _backColor; }
+    virtual void SetBackgroundColor(const glm::vec4& newColor);
     
     virtual void HandleEvents(SDL_Event& event);
     virtual void Clear();
     virtual void Render() = 0;
     virtual void PostRender();
+
+    virtual void SetVSync(bool enabled);
+    bool GetVSync() const { return _params.vsync; }
+
+
+    void SetScene(Scene* scene) { _scene = scene; }
+    Scene* GetScene() { return _scene; }
+    void ResetScene() { _scene = nullptr; }
 
 #if USE_IMGUI
     virtual void ClearImGui();
@@ -47,16 +59,18 @@ public:
     virtual void PostRenderImGui();
 #endif
 
-    inline SDL_Window* GetSdlWindow() const { return SDLWindow; }
-    inline const ISdlWindowParams& GetParams() const { return Params; }
+    inline SDL_Window* GetSdlWindow() const { return _sdlWindow; }
+    inline const ISdlWindowParams& GetParams() const { return _params; }
 
 
 private:
-    ISdlWindowParams Params;
-    SDL_Window* SDLWindow;
+    ISdlWindowParams _params;
+    SDL_Window* _sdlWindow;
+    
+    Scene* _scene;
 
-    bool bShouldClose;
-    glm::vec4 BackColor;
+    bool _bShouldClose;
+    glm::vec4 _backColor;
 };
 
 

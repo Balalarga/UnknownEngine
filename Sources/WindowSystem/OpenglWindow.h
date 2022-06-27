@@ -1,9 +1,8 @@
 #pragma once
 
-#include <vector>
-
-#include "OpenGL/Core/IRenderable.h"
 #include "WindowSystem/ISdlWindow.h"
+
+class Scene;
 
 
 class OpenglWindow: public ISdlWindow
@@ -12,17 +11,18 @@ public:
     OpenglWindow(const ISdlWindowParams& params = ISdlWindowParams());
     ~OpenglWindow() override;
 
-    IRenderable* AddObject(IRenderable*&& Obj);
 
-    void SetBackgroundColor(const glm::vec4 newColor) override;
+    void SetBackgroundColor(const glm::vec4& newColor) override;
     void Render() override;
     
+    void SetVSync(bool enabled) override;
+
 #if USE_IMGUI
     void ClearImGui() override;
     void PostRenderImGui() override;
 #endif
 
+
 private:
-    std::vector<std::unique_ptr<IRenderable>> RenderObjects;
-    SDL_GLContext GlContext;
+    SDL_GLContext _glContext;
 };
