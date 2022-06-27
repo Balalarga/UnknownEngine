@@ -1,8 +1,7 @@
 #pragma once
 
 #include <functional>
-
-#include <SDL.h>
+#include <SDL_scancode.h>
 
 
 enum class KeyState

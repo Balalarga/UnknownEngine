@@ -1,6 +1,7 @@
 ﻿#include "ISdlWindow.h"
 #include <iostream>
 
+#include <GL/glew.h>
 #if USE_IMGUI
     #include <imgui.h>
     #include <imgui_impl_sdl.h>
