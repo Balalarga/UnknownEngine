@@ -21,6 +21,10 @@ public:
 	bool HasShaderPart(const std::string& tag);
 
 	std::shared_ptr<Shader> LoadShader(const std::string& tag, ShaderPart* vShader, ShaderPart* fShader, ShaderPart* gShader = nullptr);
+	std::shared_ptr<Shader> LoadShader(const std::string& tag,
+									   const std::shared_ptr<ShaderPart>& vShader,
+									   const std::shared_ptr<ShaderPart>& fShader,
+									   const std::shared_ptr<ShaderPart>& gShader = nullptr);
 	std::shared_ptr<Shader> LoadShader(const std::string& tag, const std::string& vShader, const std::string& fShader, const std::string& gShader = "");
 	std::shared_ptr<Shader> GetShader(const std::string& tag);
 	bool HasShader(const std::string& tag);

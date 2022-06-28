@@ -18,6 +18,9 @@ public:
 	
 	IRenderable& GetRenderable() { return _rect; }
 	
+	void SetColor(const glm::fvec4& newColor);
+	glm::fvec4 GetColor() const { return _color; }
+
 	
 private:
 	glm::fvec4 _color = glm::fvec4(1);

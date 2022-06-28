@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 
+#include "Engine/Utils/Log.h"
 #include "OpenGL/Core/IRenderable.h"
 #include "OpenGL/Core/Scene.h"
 
@@ -62,6 +63,11 @@ void OpenglWindow::Render()
     {
         for (auto& Obj : scene->GetShaders())
         {
+            if (!Obj)
+            {
+                Log::Error("Null shader");
+                continue;
+            }
             Obj->Bind();
             Obj->BatchRender();
             Obj->Unbind();

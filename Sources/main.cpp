@@ -9,7 +9,6 @@
 #include "Engine/Resources/ShaderStorage.h"
 #include "Engine/Utils/Checks.h"
 #include "Engine/Utils/FileSystem.h"
-#include "OpenGL/Core/Buffer.h"
 #include "OpenGL/Core/IRenderable.h"
 #include "OpenGL/Core/Scene.h"
 
@@ -51,7 +50,8 @@ public:
 
 		Unk::Actor& actor = *actors.emplace_back(std::make_unique<Unk::Actor>());
 		Unk::ColorRectComponent* rectComp = actor.Add<Unk::ColorRectComponent>(mainScene.get());
-		// rectComp->GetRenderable().SetShader(shader.get());
+		rectComp->SetColor({0.5, 0.2, 0.2, 1.0});
+		rectComp->GetRenderable().SetShader(shader.get());
 	}
     
 	bool LoadShaders()
@@ -65,7 +65,7 @@ public:
 		auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, defaultFragmentShader);
 		CheckReturn(fsh, false)
 		
-		auto shader = storage.LoadShader("default", vsh.get(), fsh.get());
+		auto shader = storage.LoadShader("default", vsh, fsh);
 		CheckReturn(shader, false)
 		
 		return true;

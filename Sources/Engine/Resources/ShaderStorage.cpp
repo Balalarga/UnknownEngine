@@ -52,6 +52,12 @@ std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, Shader
 	return shader;
 }
 
+std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const std::shared_ptr<ShaderPart>& vShader,
+	const std::shared_ptr<ShaderPart>& fShader, const std::shared_ptr<ShaderPart>& gShader)
+{
+	return LoadShader(tag, vShader.get(), fShader.get(), gShader.get());
+}
+
 std::shared_ptr<Shader> ShaderStorage::LoadShader(const std::string& tag, const std::string& vShader, const std::string& fShader, const std::string& gShader)
 {
 	if (auto existingShader = GetShader(tag))
