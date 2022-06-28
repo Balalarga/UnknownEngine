@@ -50,6 +50,9 @@ public:
 
 		Unk::Actor& actor = *actors.emplace_back(std::make_unique<Unk::Actor>());
 		Unk::ColorRectComponent* rectComp = actor.Add<Unk::ColorRectComponent>(mainScene.get());
+		rectComp->GetRenderable().Move({0.5, 0, 0});
+		rectComp->GetRenderable().ScaleTo({0.5, 0.5, 1.0});
+		rectComp->GetRenderable().Rotate({0, 0, 45});
 		rectComp->SetColor({0.5, 0.2, 0.2, 1.0});
 		rectComp->GetRenderable().SetShader(shader.get());
 	}
@@ -67,6 +70,10 @@ public:
 		
 		auto shader = storage.LoadShader("default", vsh, fsh);
 		CheckReturn(shader, false)
+		
+		shader->Bind();
+		if (!shader->AddUniform("uModelMatrix"))
+			return false;
 		
 		return true;
 	}
