@@ -31,7 +31,10 @@ void Shader::DetachFrom(IRenderable* object)
 void Shader::BatchRender()
 {
     for (auto& obj: _renderableObjects)
+    {
+        SetUniform("uModelMatrix", obj->GetModelMatrix());
         obj->Render();
+    }
 }
 
 bool Shader::Compile(bool bCompileParts)
@@ -107,12 +110,12 @@ void Shader::Destroy()
 
 bool Shader::AddUniform(const std::string &name)
 {
+    if (_handler == 0)
+        return false;
+    
     int loc = glGetUniformLocation(_handler, name.c_str());
     if (loc < 0)
-    {
-        Unbind();
         return false;
-    }
 
     _uniforms[name] = loc;
 

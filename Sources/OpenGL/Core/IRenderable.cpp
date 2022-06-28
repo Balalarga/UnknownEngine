@@ -1,14 +1,13 @@
 #include "IRenderable.h"
 
-#include <assert.h>
 #include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "OpenGL/ErrorHandle.h"
 
 
 IRenderable::IRenderable(const Buffer &vbo):
-    _handler(0),
-    _modelMatrix(glm::mat4(1.f))
+    _handler(0)
 {
     Setup(vbo);
 }
@@ -66,4 +65,51 @@ void IRenderable::Bind()
 void IRenderable::Release()
 {
     GLCall(glBindVertexArray(0))
+}
+
+void IRenderable::Move(const glm::fvec3 dPos)
+{
+    _pos += dPos;
+    UpdateModelMatrix();
+}
+
+void IRenderable::MoveTo(const glm::fvec3 newPos)
+{
+    _pos = newPos;
+    UpdateModelMatrix();
+}
+
+void IRenderable::ScaleTo(const glm::fvec3& newScale)
+{
+    _scale = newScale;
+    UpdateModelMatrix();
+}
+
+void IRenderable::Scale(const glm::fvec3& dScale)
+{
+    _scale += dScale;
+    UpdateModelMatrix();
+}
+
+void IRenderable::RotateTo(const glm::fvec3& newRotation)
+{
+    _rotation = newRotation;
+    UpdateModelMatrix();
+}
+
+void IRenderable::Rotate(const glm::fvec3& dRotation)
+{
+    _rotation += dRotation;
+    UpdateModelMatrix();
+}
+
+void IRenderable::UpdateModelMatrix()
+{
+    constexpr float toRadians = 1.f / 180.f * 3.141592653589793238463f;
+    
+    _modelMatrix = translate(glm::mat4(1.0f), _pos);
+    _modelMatrix = scale(_modelMatrix, _scale);
+    _modelMatrix = rotate(_modelMatrix, toRadians * _rotation.x, {1, 0, 0});
+    _modelMatrix = rotate(_modelMatrix, toRadians * _rotation.y, {0, 1, 0});
+    _modelMatrix = rotate(_modelMatrix, toRadians * _rotation.z, {0, 0, 1});
 }
