@@ -30,9 +30,9 @@ void Shader::DetachFrom(IRenderable* object)
 
 void Shader::BatchRender()
 {
-    for (auto& obj: _renderableObjects)
+    for (IRenderable* const& obj : _renderableObjects)
     {
-        SetUniform("uModelMatrix", obj->GetModelMatrix());
+        obj->FillUniforms();
         obj->Render();
     }
 }

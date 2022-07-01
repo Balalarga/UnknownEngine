@@ -16,7 +16,8 @@ public:
     virtual ~IRenderable();
 
     virtual void Render();
-
+    virtual void FillUniforms();
+    
     bool Setup(const Buffer& vbo);
     
     void SetShader(Shader* shader);
@@ -40,6 +41,8 @@ public:
     const glm::fvec3& GetRotation() const { return _rotation; }
 
     const glm::fmat4& GetModelMatrix() const { return _modelMatrix; }
+
+    static const std::string ModelMatrixUniformName;
     
     
 protected:

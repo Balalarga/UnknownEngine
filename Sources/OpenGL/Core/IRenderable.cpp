@@ -3,8 +3,10 @@
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "Engine/Utils/Log.h"
 #include "OpenGL/ErrorHandle.h"
 
+const std::string IRenderable::ModelMatrixUniformName = "uModelMatrix";
 
 IRenderable::IRenderable(const Buffer &vbo):
     _handler(0)
@@ -25,6 +27,12 @@ void IRenderable::Render()
     
     Bind();
     GLCall(glDrawArrays(_vbo.DrawType, 0, _vbo.Data.Count))
+}
+
+void IRenderable::FillUniforms()
+{
+    if (_shaderPtr)
+        _shaderPtr->SetUniform(ModelMatrixUniformName, _modelMatrix);
 }
 
 bool IRenderable::Setup(const Buffer& vbo)
@@ -49,11 +57,16 @@ bool IRenderable::Setup(const Buffer& vbo)
 
 void IRenderable::SetShader(Shader* shader)
 {
+    if (!shader->AddUniform(ModelMatrixUniformName))
+    {
+        Log::Error("Shader added to renderable object hasn't got model martix uniform({})", ModelMatrixUniformName);
+        return;
+    }
+    
     if (_shaderPtr)
         _shaderPtr->DetachFrom(this);
     
     _shaderPtr = shader;
-    
     shader->AttachTo(this);
 }
 
