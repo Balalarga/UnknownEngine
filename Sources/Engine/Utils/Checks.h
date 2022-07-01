@@ -3,7 +3,7 @@
 #include "Log.h"
 
 #define CheckReturn(condition, returnValue) \
-	if (!(condition)) return returnValue;
+	if (!(condition)) { Log::Error("{}({}): {} = false", __FILE__, __LINE__, #condition); return returnValue; }
 
 #define CheckMsg(condition, msg, ...) \
 if (!(condition)) Log::Error(msg, __VA_ARGS__);

@@ -59,14 +59,14 @@ public:
 	{
 		ShaderStorage& storage = ShaderStorage::Self();
 		std::string defaultVertexShader = FileSystem::ReadResource("Shaders/default.vsh");
-		std::shared_ptr<ShaderPart> vsh = storage.LoadShaderPart("devault_vertex",
+		std::shared_ptr<ShaderPart> vsh = storage.LoadShaderPart("default_vertex",
 			ShaderPart::Type::Vertex,
 			defaultVertexShader);
 		
 		CheckReturn(vsh, false)
 
 		std::string defaultFragmentShader = FileSystem::ReadResource("Shaders/default.fsh");
-		std::shared_ptr<ShaderPart> fsh = storage.LoadShaderPart("devault_fragment",
+		std::shared_ptr<ShaderPart> fsh = storage.LoadShaderPart("default_fragment",
 			ShaderPart::Type::Fragment,
 			defaultFragmentShader);
 		
