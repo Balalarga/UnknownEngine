@@ -2,15 +2,13 @@
 
 #include "Engine/GameFramework/Game.h"
 #include "Engine/GameFramework/Components/ColorRectComponent.h"
-#include "Engine/Utils/Log.h"
-#include "WindowSystem/OpenglWindow.h"
-
 #include "Engine/GameFramework/Objects/Actor.h"
 #include "Engine/Resources/ShaderStorage.h"
 #include "Engine/Utils/Checks.h"
 #include "Engine/Utils/FileSystem.h"
-#include "OpenGL/Core/IRenderable.h"
+#include "Engine/Utils/Log.h"
 #include "OpenGL/Core/Scene.h"
+#include "WindowSystem/OpenglWindow.h"
 
 
 using namespace std;
@@ -44,8 +42,8 @@ public:
 		CheckMsgReturn(LoadShaders(), "Shaders not loaded");
         
 		std::shared_ptr<Scene> mainScene = AddAndSwitchScene<Scene>("Default");
-		
-		auto shader = ShaderStorage::Self().GetShader("default");
+
+		std::shared_ptr<Shader> shader = ShaderStorage::Self().GetShader("default");
 		CheckMsgReturn(shader, "Shader not compiled")
 
 		Unk::Actor& actor = *actors.emplace_back(std::make_unique<Unk::Actor>());
@@ -59,21 +57,23 @@ public:
     
 	bool LoadShaders()
 	{
-		auto& storage = ShaderStorage::Self();
+		ShaderStorage& storage = ShaderStorage::Self();
 		std::string defaultVertexShader = FileSystem::ReadResource("Shaders/default.vsh");
-		std::string defaultFragmentShader = FileSystem::ReadResource("Shaders/default.fsh");
-		auto vsh = storage.LoadShaderPart("devault_vertex", ShaderPart::Type::Vertex, defaultVertexShader);
+		std::shared_ptr<ShaderPart> vsh = storage.LoadShaderPart("devault_vertex",
+			ShaderPart::Type::Vertex,
+			defaultVertexShader);
+		
 		CheckReturn(vsh, false)
+
+		std::string defaultFragmentShader = FileSystem::ReadResource("Shaders/default.fsh");
+		std::shared_ptr<ShaderPart> fsh = storage.LoadShaderPart("devault_fragment",
+			ShaderPart::Type::Fragment,
+			defaultFragmentShader);
 		
-		auto fsh = storage.LoadShaderPart("devault_fragment", ShaderPart::Type::Fragment, defaultFragmentShader);
 		CheckReturn(fsh, false)
-		
-		auto shader = storage.LoadShader("default", vsh, fsh);
+
+		std::shared_ptr<Shader> shader = storage.LoadShader("default", vsh, fsh);
 		CheckReturn(shader, false)
-		
-		shader->Bind();
-		if (!shader->AddUniform("uModelMatrix"))
-			return false;
 		
 		return true;
 	}
@@ -81,7 +81,7 @@ public:
 };
 
 
-int main(int argc, char** argv)
+int main(int, char**)
 {
     Log::ScopedLog("App lifetime");
     

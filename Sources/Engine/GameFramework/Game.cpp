@@ -18,6 +18,11 @@ Game::~Game()
 	ShaderStorage::Destroy();
 }
 
+void Game::Run()
+{
+	_window->Show();
+}
+
 std::shared_ptr<Scene> Game::GetScene(const std::string& name)
 {
 	auto it = _scenes.find(name);
