@@ -2,26 +2,8 @@
 
 
 #include "BufferLayout.h"
+#include "DataPtr.h"
 
-
-struct DataPtr
-{
-    DataPtr();
-    DataPtr(void* ptr, unsigned count, unsigned itemSize);
-    
-    template<class T>
-    DataPtr(const std::vector<T>& items):
-        DataPtr((void*)&items[0], items.size(), sizeof(items[0]))
-    {}
-    template<class T>
-    DataPtr(const std::initializer_list<T>& items):
-        DataPtr((void*)&items[0], items.size(), sizeof(T))
-    {}
-
-    void* Ptr;
-    unsigned Count;
-    unsigned ItemSize;
-};
 
 struct Buffer
 {

@@ -27,7 +27,7 @@ public:
 	T* GetComponent();
 
 	template<class T>
-	inline bool HasComponent() const;
+	bool HasComponent() const;
 
 
 private:

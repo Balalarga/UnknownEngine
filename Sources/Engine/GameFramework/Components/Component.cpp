@@ -4,9 +4,9 @@ namespace Unk
 {
 
 
-Component::Component(Actor& owner):
-	_owner(&owner)
+Component::Component(Actor& owner)
 {
+	RegisterAt(owner);
 }
 
 void Component::Tick(float deltaTime)

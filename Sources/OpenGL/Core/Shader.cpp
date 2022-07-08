@@ -31,10 +31,7 @@ void Shader::DetachFrom(IRenderable* object)
 void Shader::BatchRender()
 {
     for (IRenderable* const& obj : _renderableObjects)
-    {
-        obj->FillUniforms();
         obj->Render();
-    }
 }
 
 bool Shader::Compile(bool bCompileParts)

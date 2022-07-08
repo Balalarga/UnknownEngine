@@ -22,7 +22,7 @@ struct ISdlWindowParams
     unsigned width = 800;
     unsigned height = 600;
     unsigned flags = SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI;
-
+    unsigned fpsTicks = 60;
     bool vsync = false;
     bool fullScreen = false;
 };
@@ -35,11 +35,15 @@ public:
     virtual ~ISdlWindow();
 
     void Show();
-    void Close();
-
-    inline const glm::vec4& GetBackgroundColor() { return _backColor; }
-    virtual void SetBackgroundColor(const glm::vec4& newColor);
+    virtual bool ShouldClose() const { return _bShouldClose; }
     
+    virtual void PollEvents();
+    virtual void RenderFrame();
+    virtual void Close();
+
+    const glm::vec4& GetBackgroundColor() { return _backColor; }
+    virtual void SetBackgroundColor(const glm::vec4& newColor);
+
     virtual void HandleEvents(SDL_Event& event);
     virtual void Clear();
     virtual void Render() = 0;
@@ -59,8 +63,8 @@ public:
     virtual void PostRenderImGui();
 #endif
 
-    inline SDL_Window* GetSdlWindow() const { return _sdlWindow; }
-    inline const ISdlWindowParams& GetParams() const { return _params; }
+    SDL_Window* GetSdlWindow() const { return _sdlWindow; }
+    const ISdlWindowParams& GetParams() const { return _params; }
 
 
 private:

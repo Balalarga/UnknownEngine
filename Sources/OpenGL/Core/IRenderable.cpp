@@ -1,6 +1,5 @@
 #include "IRenderable.h"
 
-#include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "Engine/Utils/Log.h"
@@ -24,6 +23,9 @@ void IRenderable::Render()
 {
     if ( !_bVisible )
         return;
+
+    if (_shaderPtr)
+        FillUniforms();
     
     Bind();
     GLCall(glDrawArrays(_vbo.DrawType, 0, _vbo.Data.Count))
@@ -31,8 +33,7 @@ void IRenderable::Render()
 
 void IRenderable::FillUniforms()
 {
-    if (_shaderPtr)
-        _shaderPtr->SetUniform(ModelMatrixUniformName, _modelMatrix);
+    _shaderPtr->SetUniform(ModelMatrixUniformName, _modelMatrix);
 }
 
 bool IRenderable::Setup(const Buffer& vbo)

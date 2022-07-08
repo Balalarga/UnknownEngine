@@ -66,26 +66,29 @@ void ISdlWindow::SetBackgroundColor(const glm::vec4& newColor)
     _backColor = newColor;
 }
 
+void ISdlWindow::PollEvents()
+{
+    SDL_Event event;
+    while (SDL_PollEvent(&event))
+        HandleEvents(event);
+}
+
+void ISdlWindow::RenderFrame()
+{
+#if USE_IMGUI
+    ClearImGui();
+    RenderImGui();
+    PostRenderImGui();
+#endif
+
+    Clear();
+    Render();
+    PostRender();
+}
+
 void ISdlWindow::Show()
 {
     _bShouldClose = false;
-
-    while (!_bShouldClose)
-    {
-        SDL_Event event;
-        while (SDL_PollEvent(&event))
-            HandleEvents(event);
-
-#if USE_IMGUI
-        ClearImGui();
-        RenderImGui();
-        PostRenderImGui();
-#endif
-
-        Clear();
-        Render();
-        PostRender();
-    }
 }
 
 void ISdlWindow::Close()
@@ -123,11 +126,6 @@ void ISdlWindow::HandleEvents(SDL_Event& event)
 void ISdlWindow::Clear()
 {
     glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-}
-
-void ISdlWindow::Render()
-{
-
 }
 
 void ISdlWindow::PostRender()

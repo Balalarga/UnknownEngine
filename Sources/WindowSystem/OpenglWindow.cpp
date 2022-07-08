@@ -63,17 +63,11 @@ void OpenglWindow::Render()
     {
         for (auto& Obj : scene->GetShaders())
         {
-            if (!Obj)
-            {
-                Log::Error("Null shader");
-                continue;
-            }
             Obj->Bind();
             Obj->BatchRender();
             Obj->Unbind();
         }
     }
-    ISdlWindow::Render();
 }
 
 void OpenglWindow::SetVSync(bool enabled)

@@ -3,22 +3,6 @@
 #include "OpenGL/ErrorHandle.h"
 
 
-DataPtr::DataPtr():
-    Ptr(nullptr),
-    Count(0),
-    ItemSize(0)
-{
-    
-}
-
-DataPtr::DataPtr(void* ptr, unsigned count, unsigned itemSize):
-    Ptr(ptr),
-    Count(count),
-    ItemSize(itemSize)
-{
-
-}
-
 Buffer::Buffer(const DataPtr& data, const BufferLayout& layout):
     Data(data),
     Layout(layout)

@@ -19,6 +19,11 @@ public:
 	virtual ~Game();
 	
 	virtual void Run();
+	virtual void Update(double dt);
+
+	void SetUpdateTicks(unsigned ticks);
+	double GetUpdateTime() { return _upsTime; }
+	unsigned GetUpdateTicks() { return _upsTicks; }
 	
 	std::shared_ptr<Scene> GetScene(const std::string& name);
 	bool HasScene(const std::string& name) const { return _scenes.contains(name); }
@@ -33,6 +38,9 @@ public:
 
 
 private:
+	unsigned _upsTicks;
+	double _upsTime;
+	
 	ISdlWindow* _window;
 	
 	std::map<std::string, std::shared_ptr<Scene>> _scenes;
